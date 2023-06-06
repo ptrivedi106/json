@@ -1,0 +1,5891 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "PlanetFitnessDF"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_INVOICE_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_INVOICE",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Abcbilling_Invoice_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ABCBILLING_INVOICE_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_INVOICE",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT \n\tLOWER(CONCAT (SUBSTR(HEX(inv_id), 1, 8),'-',SUBSTR(HEX(inv_id), 9, 4),'-',SUBSTR(HEX(inv_id), 13, 4),'-',SUBSTR(HEX(inv_id), 17, 4),'-',SUBSTR(HEX(inv_id), 21))) AS inv_id\n\t,LOWER(CONCAT (SUBSTR(HEX(loc_id), 1, 8),'-',SUBSTR(HEX(loc_id), 9, 4),'-',SUBSTR(HEX(loc_id), 13, 4),'-',SUBSTR(HEX(loc_id), 17, 4),'-',SUBSTR(HEX(loc_id), 21))) AS loc_id\n\t,inv_number\n\t,inv_posting_date\n\t,inv_transfer_date\n\t,inv_type\n\t,inv_subtotal\n\t,inv_tax\n\t,inv_total\n\t,LOWER(CONCAT (SUBSTR(HEX(sub_id), 1, 8),'-',SUBSTR(HEX(sub_id), 9, 4),'-',SUBSTR(HEX(sub_id), 13, 4),'-',SUBSTR(HEX(sub_id), 17, 4),'-',SUBSTR(HEX(sub_id), 21))) AS sub_id\n\t,LOWER(CONCAT (SUBSTR(HEX(emp_id), 1, 8),'-',SUBSTR(HEX(emp_id), 9, 4),'-',SUBSTR(HEX(emp_id), 13, 4),'-',SUBSTR(HEX(emp_id), 17, 4),'-',SUBSTR(HEX(emp_id), 21))) AS emp_id\n\t,inv_created\n\t,inv_modified\n\t,LOWER(CONCAT (SUBSTR(HEX(org_id), 1, 8),'-',SUBSTR(HEX(org_id), 9, 4),'-',SUBSTR(HEX(org_id), 13, 4),'-',SUBSTR(HEX(org_id), 17, 4),'-',SUBSTR(HEX(org_id), 21))) AS org_id\n\t,inv_status\n\t,LOWER(CONCAT (SUBSTR(HEX(sfr_id), 1, 8),'-',SUBSTR(HEX(sfr_id), 9, 4),'-',SUBSTR(HEX(sfr_id), 13, 4),'-',SUBSTR(HEX(sfr_id), 17, 4),'-',SUBSTR(HEX(sfr_id), 21))) AS sfr_id\n\t,is_inv_type_recurring\n\t,LOWER(CONCAT (SUBSTR(HEX(scc_id), 1, 8),'-',SUBSTR(HEX(scc_id), 9, 4),'-',SUBSTR(HEX(scc_id), 13, 4),'-',SUBSTR(HEX(scc_id), 17, 4),'-',SUBSTR(HEX(scc_id), 21))) AS scc_id\n\t,inv_is_generate_fees_active\n\t,inv_due_date\n\t,LOWER(CONCAT (SUBSTR(HEX(agrm_id), 1, 8),'-',SUBSTR(HEX(agrm_id), 9, 4),'-',SUBSTR(HEX(agrm_id), 13, 4),'-',SUBSTR(HEX(agrm_id), 17, 4),'-',SUBSTR(HEX(agrm_id), 21))) AS agrm_id\n   ,led_type\n   ,inv_is_paid_in_advance\n   ,LOWER(CONCAT (SUBSTR(HEX(inv_origin_id), 1, 8),'-',SUBSTR(HEX(inv_origin_id), 9, 4),'-',SUBSTR(HEX(inv_origin_id), 13, 4),'-',SUBSTR(HEX(inv_origin_id), 17, 4),'-',SUBSTR(HEX(inv_origin_id), 21))) AS inv_origin_id\nFROM abcbilling.invoice\nWHERE inv_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND inv_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "inv_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "inv_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "inv_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "inv_number",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "inv_posting_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "inv_posting_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "inv_transfer_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "inv_transfer_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "inv_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "inv_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "inv_subtotal",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "inv_subtotal",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "inv_tax",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "inv_tax",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "inv_total",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "inv_total",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "sub_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "sub_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "inv_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "inv_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "inv_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "inv_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "inv_status",
+											"type": "String"
+										},
+										"sink": {
+											"name": "inv_status",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "sfr_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "sfr_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "is_inv_type_recurring",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "is_inv_type_recurring",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "scc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "scc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "inv_is_generate_fees_active",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "inv_is_generate_fees_active",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "inv_due_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "inv_due_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "agrm_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "agrm_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "led_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "led_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "inv_is_paid_in_advance",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "inv_is_paid_in_advance",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "inv_origin_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "inv_origin_id",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ABCBILLING_INVOICE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-23T13:58:09Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_Invoice_Item_Price_Adjustment_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_INVOICE_ITEM_PRICE_ADJUSTMENT",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Abcbilling_Invoice_item_price_adjustment_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.Abcbilling_INVOICE_ITEM_PRICE_ADJUSTMENT_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_INVOICE_ITEM_PRICE_ADJUSTMENT",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT\nLOWER(CONCAT (SUBSTR(HEX(iipa_id), 1, 8),'-',SUBSTR(HEX(iipa_id), 9, 4),'-',SUBSTR(HEX(iipa_id), 13, 4),'-',SUBSTR(HEX(iipa_id), 17, 4),'-',SUBSTR(HEX(iipa_id), 21))) AS iipa_id,\nLOWER(CONCAT (SUBSTR(HEX(invi_id), 1, 8),'-',SUBSTR(HEX(invi_id), 9, 4),'-',SUBSTR(HEX(invi_id), 13, 4),'-',SUBSTR(HEX(invi_id), 17, 4),'-',SUBSTR(HEX(invi_id), 21))) AS invi_id,\nLOWER(CONCAT (SUBSTR(HEX(sipa_id), 1, 8),'-',SUBSTR(HEX(sipa_id), 9, 4),'-',SUBSTR(HEX(sipa_id), 13, 4),'-',SUBSTR(HEX(sipa_id), 17, 4),'-',SUBSTR(HEX(sipa_id), 21))) AS sipa_id,\niipa_amount,\niipa_applied_config_amount,\nLOWER(CONCAT (SUBSTR(HEX(org_id), 1, 8),'-',SUBSTR(HEX(org_id), 9, 4),'-',SUBSTR(HEX(org_id), 13, 4),'-',SUBSTR(HEX(org_id), 17, 4),'-',SUBSTR(HEX(org_id), 21))) AS org_id,\niipa_created,\niipa_direction\t\nFROM abcbilling.invoice_item_price_adjustment\nWHERE iipa_created >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND iipa_created < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "iipa_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "iipa_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "invi_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "invi_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "sipa_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "sipa_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "iipa_amount",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "iipa_amount",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "iipa_applied_config_amount",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "iipa_applied_config_amount",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "iipa_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "iipa_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "iipa_direction",
+											"type": "String"
+										},
+										"sink": {
+											"name": "iipa_direction",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_INVOICE_ITEM_PRICE_ADJUSTMENT_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-14T14:09:12Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_Invoice_Refund_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_Invoice_Refund",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Abcbilling_Invoice_Refund_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ABCBILLING_Invoice_Refund_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_Invoice_Refund",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT \n\tLOWER(CONCAT (SUBSTR(HEX(ir_id), 1, 8),'-',SUBSTR(HEX(ir_id), 9, 4),'-',SUBSTR(HEX(ir_id), 13, 4),'-',SUBSTR(HEX(ir_id), 17, 4),'-',SUBSTR(HEX(ir_id), 21))) AS ir_id\n\t,ir_number\n\t,ir_posting_date\n\t,ir_amount\n\t,LOWER(CONCAT (SUBSTR(HEX(ir_transaction_id), 1, 8),'-',SUBSTR(HEX(ir_transaction_id), 9, 4),'-',SUBSTR(HEX(ir_transaction_id), 13, 4),'-',SUBSTR(HEX(ir_transaction_id), 17, 4),'-',SUBSTR(HEX(ir_transaction_id), 21))) AS ir_transaction_id\n\t,LOWER(CONCAT (SUBSTR(HEX(loc_id), 1, 8),'-',SUBSTR(HEX(loc_id), 9, 4),'-',SUBSTR(HEX(loc_id), 13, 4),'-',SUBSTR(HEX(loc_id), 17, 4),'-',SUBSTR(HEX(loc_id), 21))) AS loc_id\n\t,LOWER(CONCAT (SUBSTR(HEX(org_id), 1, 8),'-',SUBSTR(HEX(org_id), 9, 4),'-',SUBSTR(HEX(org_id), 13, 4),'-',SUBSTR(HEX(org_id), 17, 4),'-',SUBSTR(HEX(org_id), 21))) AS org_id\n\t,ir_created\n\t,ir_modified\n\t,LOWER(CONCAT (SUBSTR(HEX(ac_id), 1, 8),'-',SUBSTR(HEX(ac_id), 9, 4),'-',SUBSTR(HEX(ac_id), 13, 4),'-',SUBSTR(HEX(ac_id), 17, 4),'-',SUBSTR(HEX(ac_id), 21))) AS ac_id\n\t,ir_reason\n\t,ir_transaction_type\n\t,LOWER(CONCAT (SUBSTR(HEX(agrm_id), 1, 8),'-',SUBSTR(HEX(agrm_id), 9, 4),'-',SUBSTR(HEX(agrm_id), 13, 4),'-',SUBSTR(HEX(agrm_id), 17, 4),'-',SUBSTR(HEX(agrm_id), 21))) AS agrm_id\n    ,led_type\n\t,ir_transaction_number\nFROM abcbilling.invoice_refund\nWHERE ir_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND ir_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "ir_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ir_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ir_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ir_number",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ir_posting_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "ir_posting_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ir_amount",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "ir_amount",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "ir_transaction_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ir_transaction_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ir_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "ir_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ir_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "ir_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ac_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ac_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ir_reason",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ir_reason",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ir_transaction_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ir_transaction_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "agrm_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "agrm_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "led_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "led_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ir_transaction_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ir_transaction_number",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_RCM_ABCBILLING_INVOICE_REFUND_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-14T14:09:12Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_LINKED_TRANSACTION_ENTRY_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_LINKED_TRANSACTION_ENTRY",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Abcbilling_Linked_Transaction_Entry_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_LINKED_TRANSACTION_ENTRY",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT \nLOWER(CONCAT (SUBSTR(HEX(lte_id), 1, 8),'-',SUBSTR(HEX(lte_id), 9, 4),'-',SUBSTR(HEX(lte_id), 13, 4),'-',SUBSTR(HEX(lte_id), 17, 4),'-',SUBSTR(HEX(lte_id), 21))) AS lte_id ,\nlte_amount,\nlte_type,\nlte_target_transaction_type,\nLOWER(CONCAT (SUBSTR(HEX(lte_target_transaction_id), 1, 8),'-',SUBSTR(HEX(lte_target_transaction_id), 9, 4),'-',SUBSTR(HEX(lte_target_transaction_id), 13, 4),'-',SUBSTR(HEX(lte_target_transaction_id), 17, 4),'-',SUBSTR(HEX(lte_target_transaction_id), 21))) AS lte_target_transaction_id,\nlte_applied_transaction_type,\nLOWER(CONCAT (SUBSTR(HEX(lte_applied_transaction_id), 1, 8),'-',SUBSTR(HEX(lte_applied_transaction_id), 9, 4),'-',SUBSTR(HEX(lte_applied_transaction_id), 13, 4),'-',SUBSTR(HEX(lte_applied_transaction_id), 17, 4),'-',SUBSTR(HEX(lte_applied_transaction_id), 21))) AS lte_applied_transaction_id ,\nlte_posting_date,\nLOWER(CONCAT (SUBSTR(HEX(loc_id), 1, 8),'-',SUBSTR(HEX(loc_id), 9, 4),'-',SUBSTR(HEX(loc_id), 13, 4),'-',SUBSTR(HEX(loc_id), 17, 4),'-',SUBSTR(HEX(loc_id), 21))) AS loc_id ,\nLOWER(CONCAT (SUBSTR(HEX(org_id), 1, 8),'-',SUBSTR(HEX(org_id), 9, 4),'-',SUBSTR(HEX(org_id), 13, 4),'-',SUBSTR(HEX(org_id), 17, 4),'-',SUBSTR(HEX(org_id), 21))) AS org_id ,\nlte_created,\nlte_modified\nFROM abcbilling.linked_transaction_entry\nWHERE  lte_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND    lte_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "lte_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "lte_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "lte_amount",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "lte_amount",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "lte_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "lte_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "lte_target_transaction_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "lte_target_transaction_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "lte_target_transaction_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "lte_target_transaction_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "lte_applied_transaction_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "lte_applied_transaction_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "lte_applied_transaction_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "lte_applied_transaction_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "lte_posting_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "lte_posting_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "lte_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "lte_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "lte_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "lte_modified",
+											"type": "DateTime"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ABCBILLING_LINKED_TRANSACTION_ENTRY_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ABCBILLING_LINKED_TRANSACTION_ENTRY_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-13T17:07:13Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_MEMBER_TRANSACTION_FEE_CONFIG_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_MEMBER_TRANSACTION_FEE_CONFIG",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Abcbilling_Member_Transaction_Fee_Config_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ABCBILLING_MEMBER_TRANSACTION_FEE_CONFIG_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_MEMBER_TRANSACTION_FEE_CONFIG",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT LOWER(CONCAT (SUBSTR(HEX(mtfc_id), 1, 8),'-',SUBSTR(HEX(mtfc_id), 9, 4),'-',SUBSTR(HEX(mtfc_id), 13, 4),'-',SUBSTR(HEX(mtfc_id), 17, 4),'-',SUBSTR(HEX(mtfc_id), 21))) AS mtfc_id ,\nmtfc_type,\nmtfc_start_date,\nmtfc_assessment_start_date,\nmtfc_end_date,\nmtfc_flat_amount,\nmtfc_fee_percentage,\nmtfc_is_assess_fee,\nmtfc_fee_grace_days,\nLOWER(CONCAT (SUBSTR(HEX(org_id), 1, 8),'-',SUBSTR(HEX(org_id), 9, 4),'-',SUBSTR(HEX(org_id), 13, 4),'-',SUBSTR(HEX(org_id), 17, 4),'-',SUBSTR(HEX(org_id), 21))) AS org_id ,\nmtfc_created,\nmtfc_modified,\nLOWER(CONCAT (SUBSTR(HEX(loc_id), 1, 8),'-',SUBSTR(HEX(loc_id), 9, 4),'-',SUBSTR(HEX(loc_id), 13, 4),'-',SUBSTR(HEX(loc_id), 17, 4),'-',SUBSTR(HEX(loc_id), 21))) AS loc_id,\nLOWER(CONCAT (SUBSTR(HEX(ag_id), 1, 8),'-',SUBSTR(HEX(ag_id), 9, 4),'-',SUBSTR(HEX(ag_id), 13, 4),'-',SUBSTR(HEX(ag_id), 17, 4),'-',SUBSTR(HEX(ag_id), 21))) AS ag_id\t\nFROM  abcbilling.member_transaction_fee_config\nWHERE  mtfc_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND    mtfc_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "mtfc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mtfc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mtfc_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mtfc_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mtfc_start_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "mtfc_start_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "mtfc_assessment_start_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "mtfc_assessment_start_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "mtfc_end_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "mtfc_end_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "mtfc_flat_amount",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "mtfc_flat_amount",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "mtfc_fee_percentage",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "mtfc_fee_percentage",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "mtfc_is_assess_fee",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "mtfc_is_assess_fee",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "mtfc_fee_grace_days",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "mtfc_fee_grace_days",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mtfc_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "mtfc_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "mtfc_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "mtfc_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ag_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ag_id",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ABCBILLING_MEMBER_TRANSACTION_FEE_CONFIG_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-23T13:58:09Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_MEMBER_TRANSACTION_FEE_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_MEMBER_TRANSACTION_FEE",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Abcbilling_Member_Transaction_Fee_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ABCBILLING_MEMBER_TRANSACTION_FEE_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_MEMBER_TRANSACTION_FEE",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT \nLOWER(CONCAT (SUBSTR(HEX(mtf_id), 1, 8),'-',SUBSTR(HEX(mtf_id), 9, 4),'-',SUBSTR(HEX(mtf_id), 13, 4),'-',SUBSTR(HEX(mtf_id), 17, 4),'-',SUBSTR(HEX(mtf_id), 21))) AS mtf_id ,\nLOWER(CONCAT (SUBSTR(HEX(mtfc_id), 1, 8),'-',SUBSTR(HEX(mtfc_id), 9, 4),'-',SUBSTR(HEX(mtfc_id), 13, 4),'-',SUBSTR(HEX(mtfc_id), 17, 4),'-',SUBSTR(HEX(mtfc_id), 21))) AS mtfc_id ,\nLOWER(CONCAT (SUBSTR(HEX(client_id), 1, 8),'-',SUBSTR(HEX(client_id), 9, 4),'-',SUBSTR(HEX(client_id), 13, 4),'-',SUBSTR(HEX(client_id), 17, 4),'-',SUBSTR(HEX(client_id), 21))) AS client_id ,\nLOWER(CONCAT (SUBSTR(HEX(mtf_transaction_id), 1, 8),'-',SUBSTR(HEX(mtf_transaction_id), 9, 4),'-',SUBSTR(HEX(mtf_transaction_id), 13, 4),'-',SUBSTR(HEX(mtf_transaction_id), 17, 4),'-',SUBSTR(HEX(mtf_transaction_id), 21))) AS mtf_transaction_id ,\nmtf_type,\nmtf_amount,\nLOWER(CONCAT (SUBSTR(HEX(org_id), 1, 8),'-',SUBSTR(HEX(org_id), 9, 4),'-',SUBSTR(HEX(org_id), 13, 4),'-',SUBSTR(HEX(org_id), 17, 4),'-',SUBSTR(HEX(org_id), 21))) AS org_id ,\nmtf_created,\nmtf_modified,\nmtf_status,\nmtf_number,\nmtf_config_type,\nmtf_due_date,\nmtf_posting_date,\nLOWER(CONCAT (SUBSTR(HEX(agrm_id), 1, 8),'-',SUBSTR(HEX(agrm_id), 9, 4),'-',SUBSTR(HEX(agrm_id), 13, 4),'-',SUBSTR(HEX(agrm_id), 17, 4),'-',SUBSTR(HEX(agrm_id), 21))) AS agrm_id,\nled_type,\nLOWER(CONCAT (SUBSTR(HEX(mtf_origin_id), 1, 8),'-',SUBSTR(HEX(mtf_origin_id), 9, 4),'-',SUBSTR(HEX(mtf_origin_id), 13, 4),'-',SUBSTR(HEX(mtf_origin_id), 17, 4),'-',SUBSTR(HEX(mtf_origin_id), 21))) AS mtf_origin_id\nFROM abcbilling.member_transaction_fee\nWHERE  mtf_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND    mtf_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "mtf_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mtf_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mtfc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mtfc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "client_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "client_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mtf_transaction_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mtf_transaction_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mtf_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mtf_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mtf_amount",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "mtf_amount",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mtf_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "mtf_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "mtf_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "mtf_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "mtf_status",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mtf_status",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mtf_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mtf_number",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mtf_config_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mtf_config_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mtf_due_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "mtf_due_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "mtf_posting_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "mtf_posting_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "agrm_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "agrm_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "led_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "led_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mtf_origin_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mtf_origin_id",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ABCBILLING_MEMBER_TRANSACTION_FEE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-11T11:45:35Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_PAYMENT_METHOD_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_PAYMENT_METHOD",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Abcbilling_Payment_Method_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ABCBILLING_PAYMENT_METHOD_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_PAYMENT_METHOD",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT \nLOWER(CONCAT (SUBSTR(HEX(pame_id), 1, 8),'-',SUBSTR(HEX(pame_id), 9, 4),'-',SUBSTR(HEX(pame_id), 13, 4),'-',SUBSTR(HEX(pame_id), 17, 4),'-',SUBSTR(HEX(pame_id), 21))) AS pame_id ,\npame_type,\n\tpame_account_holder,\n\tpame_email,\n\tpame_phone,\n\tpame_last_four,\n\tpame_alias,\n\tpame_created,\n\tpame_modified,\n\tLOWER(CONCAT (SUBSTR(HEX(org_id), 1, 8),'-',SUBSTR(HEX(org_id), 9, 4),'-',SUBSTR(HEX(org_id), 13, 4),'-',SUBSTR(HEX(org_id), 17, 4),'-',SUBSTR(HEX(org_id), 21))) AS org_id,\n\tLOWER(CONCAT (SUBSTR(HEX(tok_id), 1, 8),'-',SUBSTR(HEX(tok_id), 9, 4),'-',SUBSTR(HEX(tok_id), 13, 4),'-',SUBSTR(HEX(tok_id), 17, 4),'-',SUBSTR(HEX(tok_id), 21))) AS tok_id,\n\tLOWER(CONCAT (SUBSTR(HEX(adr_id), 1, 8),'-',SUBSTR(HEX(adr_id), 9, 4),'-',SUBSTR(HEX(adr_id), 13, 4),'-',SUBSTR(HEX(adr_id), 17, 4),'-',SUBSTR(HEX(adr_id), 21))) AS adr_id,\n\tLOWER(CONCAT (SUBSTR(HEX(client_id), 1, 8),'-',SUBSTR(HEX(client_id), 9, 4),'-',SUBSTR(HEX(client_id), 13, 4),'-',SUBSTR(HEX(client_id), 17, 4),'-',SUBSTR(HEX(client_id), 21))) AS client_id,\n\tLOWER(CONCAT (SUBSTR(HEX(payor_id), 1, 8),'-',SUBSTR(HEX(payor_id), 9, 4),'-',SUBSTR(HEX(payor_id), 13, 4),'-',SUBSTR(HEX(payor_id), 17, 4),'-',SUBSTR(HEX(payor_id), 21))) AS payor_id,\n\tpame_subtype,\n\tpame_brand,\n\tpame_expiration_month,\n\tpame_expiration_year,\n\tpame_routing,\n\tpame_delivery_method,\n\tpame_is_default,\n\tpame_expiration_processed,\n\tLOWER(CONCAT (SUBSTR(HEX(loc_id), 1, 8),'-',SUBSTR(HEX(loc_id), 9, 4),'-',SUBSTR(HEX(loc_id), 13, 4),'-',SUBSTR(HEX(loc_id), 17, 4),'-',SUBSTR(HEX(loc_id), 21))) AS loc_id,\n\tpame_status,\n\tpame_revoked_date,\n\tpame_is_one_time_payment,\n\tpame_is_wire_transfer_type,\n\tpame_ffc_name,\n\tpame_ffc_address1,\n\tpame_ffc_address2,\n\tpame_ffc_routing_number,\n\tpame_ffc_account_last_four,\n\tLOWER(CONCAT (SUBSTR(HEX(we_id), 1, 8),'-',SUBSTR(HEX(we_id), 9, 4),'-',SUBSTR(HEX(we_id), 13, 4),'-',SUBSTR(HEX(we_id), 17, 4),'-',SUBSTR(HEX(we_id), 21))) AS we_id,\n\tpame_we_status,\n\tpame_we_sub_status\nFROM abcbilling.payment_method\nWHERE  pame_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND    pame_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "pame_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_account_holder",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_account_holder",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_email",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_email",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_phone",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_phone",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_last_four",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_last_four",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_alias",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_alias",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "pame_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "pame_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "tok_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "tok_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "adr_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "adr_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "client_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "client_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "payor_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "payor_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_subtype",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_subtype",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_brand",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_brand",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_expiration_month",
+											"type": "Int16"
+										},
+										"sink": {
+											"name": "pame_expiration_month",
+											"type": "Int16"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_expiration_year",
+											"type": "Int16"
+										},
+										"sink": {
+											"name": "pame_expiration_year",
+											"type": "Int16"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_routing",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_routing",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_delivery_method",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_delivery_method",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_is_default",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "pame_is_default",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_expiration_processed",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "pame_expiration_processed",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_status",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_status",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_revoked_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "pame_revoked_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_is_one_time_payment",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "pame_is_one_time_payment",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_is_wire_transfer_type",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "pame_is_wire_transfer_type",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_ffc_name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_ffc_name",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_ffc_address1",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_ffc_address1",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_ffc_address2",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_ffc_address2",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_ffc_routing_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_ffc_routing_number",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_ffc_account_last_four",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_ffc_account_last_four",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "we_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "we_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_we_status",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_we_status",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_we_sub_status",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_we_sub_status",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ABCBILLING_PAYMENT_METHOD_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-11-15T14:59:40Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_PAYMENT_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_INVOICE_ITEM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Abcbilling_Payment_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ABCBILLING_PAYMENT_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_INVOICE_ITEM",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT \nLOWER(CONCAT (SUBSTR(HEX(pay_id), 1, 8),'-',SUBSTR(HEX(pay_id), 9, 4),'-',SUBSTR(HEX(pay_id), 13, 4),'-',SUBSTR(HEX(pay_id), 17, 4),'-',SUBSTR(HEX(pay_id), 21))) AS pay_id ,\nLOWER(CONCAT (SUBSTR(HEX(loc_id), 1, 8),'-',SUBSTR(HEX(loc_id), 9, 4),'-',SUBSTR(HEX(loc_id), 13, 4),'-',SUBSTR(HEX(loc_id), 17, 4),'-',SUBSTR(HEX(loc_id), 21))) AS loc_id ,\nLOWER(CONCAT (SUBSTR(HEX(st_id), 1, 8),'-',SUBSTR(HEX(st_id), 9, 4),'-',SUBSTR(HEX(st_id), 13, 4),'-',SUBSTR(HEX(st_id), 17, 4),'-',SUBSTR(HEX(st_id), 21))) AS st_id ,\npay_posting_date,\npay_amount,\nLOWER(CONCAT (SUBSTR(HEX(pame_id), 1, 8),'-',SUBSTR(HEX(pame_id), 9, 4),'-',SUBSTR(HEX(pame_id), 13, 4),'-',SUBSTR(HEX(pame_id), 17, 4),'-',SUBSTR(HEX(pame_id), 21))) AS pame_id ,\npay_status,\npay_payment_gateway_transaction_id,\nLOWER(CONCAT (SUBSTR(HEX(org_id), 1, 8),'-',SUBSTR(HEX(org_id), 9, 4),'-',SUBSTR(HEX(org_id), 13, 4),'-',SUBSTR(HEX(org_id), 17, 4),'-',SUBSTR(HEX(org_id), 21))) AS org_id ,\npay_created,\npay_modified,\nreattempted_pay_id,\npay_type,\npay_due_date,\nLOWER(CONCAT (SUBSTR(HEX(agrm_id), 1, 8),'-',SUBSTR(HEX(agrm_id), 9, 4),'-',SUBSTR(HEX(agrm_id), 13, 4),'-',SUBSTR(HEX(agrm_id), 17, 4),'-',SUBSTR(HEX(agrm_id), 21))) AS agrm_id ,\nLOWER(CONCAT (SUBSTR(HEX(tok_id), 1, 8),'-',SUBSTR(HEX(tok_id), 9, 4),'-',SUBSTR(HEX(tok_id), 13, 4),'-',SUBSTR(HEX(tok_id), 17, 4),'-',SUBSTR(HEX(tok_id), 21))) AS tok_id ,\npay_number,\npay_retry_count,\ntran_unique_transaction_number,\nLOWER(CONCAT (SUBSTR(HEX(payor_id), 1, 8),'-',SUBSTR(HEX(payor_id), 9, 4),'-',SUBSTR(HEX(payor_id), 13, 4),'-',SUBSTR(HEX(payor_id), 17, 4),'-',SUBSTR(HEX(payor_id), 21))) AS payor_id ,\npay_effective_date,\npay_Scheduled_date,\nLOWER(CONCAT (SUBSTR(HEX(bpay_id ), 1, 8),'-',SUBSTR(HEX(bpay_id), 9, 4),'-',SUBSTR(HEX(bpay_id ), 13, 4),'-',SUBSTR(HEX(bpay_id ), 17, 4),'-',SUBSTR(HEX(bpay_id), 21))) AS bpay_id ,\npay_comment,\nLOWER(CONCAT (SUBSTR(HEX(source_loc_id ), 1, 8),'-',SUBSTR(HEX(source_loc_id), 9, 4),'-',SUBSTR(HEX(source_loc_id ), 13, 4),'-',SUBSTR(HEX(source_loc_id ), 17, 4),'-',SUBSTR(HEX(source_loc_id), 21))) AS source_loc_id,\nLOWER(CONCAT (SUBSTR(HEX(slb_id), 1, 8),'-',SUBSTR(HEX(slb_id), 9, 4),'-',SUBSTR(HEX(slb_id), 13, 4),'-',SUBSTR(HEX(slb_id), 17, 4),'-',SUBSTR(HEX(slb_id), 21))) AS slb_id,\nled_type,\npay_response_codes,\nLOWER(CONCAT (SUBSTR(HEX(ppt_id), 1, 8),'-',SUBSTR(HEX(ppt_id), 9, 4),'-',SUBSTR(HEX(ppt_id), 13, 4),'-',SUBSTR(HEX(ppt_id), 17, 4),'-',SUBSTR(HEX(ppt_id), 21))) AS ppt_id,\nLOWER(CONCAT (SUBSTR(HEX(bapm_id), 1, 8),'-',SUBSTR(HEX(bapm_id), 9, 4),'-',SUBSTR(HEX(bapm_id), 13, 4),'-',SUBSTR(HEX(bapm_id), 17, 4),'-',SUBSTR(HEX(bapm_id), 21))) AS bapm_id\nFROM abcbilling.payment\nWHERE  pay_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND    pay_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "pay_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pay_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "st_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "st_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pay_posting_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "pay_posting_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "pay_amount",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "pay_amount",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pay_status",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pay_status",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pay_payment_gateway_transaction_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pay_payment_gateway_transaction_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pay_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "pay_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "pay_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "pay_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "reattempted_pay_id",
+											"type": "Byte[]"
+										},
+										"sink": {
+											"name": "reattempted_pay_id",
+											"type": "Byte[]"
+										}
+									},
+									{
+										"source": {
+											"name": "pay_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pay_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pay_due_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "pay_due_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "agrm_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "agrm_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "tok_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "tok_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pay_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pay_number",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pay_retry_count",
+											"type": "Int16"
+										},
+										"sink": {
+											"name": "pay_retry_count",
+											"type": "Int16"
+										}
+									},
+									{
+										"source": {
+											"name": "tran_unique_transaction_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "tran_unique_transaction_number",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "payor_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "payor_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pay_effective_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "pay_effective_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "pay_Scheduled_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "pay_Scheduled_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "bpay_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "bpay_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pay_comment",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pay_comment",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "source_loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "source_loc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "slb_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "slb_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "led_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "led_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pay_response_codes",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pay_response_codes",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ppt_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ppt_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "bapm_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "bapm_id",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ABCBILLING_PAYMENT_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-11-15T14:59:40Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_PAYOR_PROFILE_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_PAYOR_PROFILE",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Abcbilling_Payor_Profile_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ABCBILLING_PAYOR_PROFILE_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_PAYOR_PROFILE",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT \nLOWER(CONCAT (SUBSTR(HEX(payor_id), 1, 8),'-',SUBSTR(HEX(payor_id), 9, 4),'-',SUBSTR(HEX(payor_id), 13, 4),'-',SUBSTR(HEX(payor_id), 17, 4),'-',SUBSTR(HEX(payor_id), 21))) AS payor_id ,\nLOWER(CONCAT (SUBSTR(HEX(loc_id), 1, 8),'-',SUBSTR(HEX(loc_id), 9, 4),'-',SUBSTR(HEX(loc_id), 13, 4),'-',SUBSTR(HEX(loc_id), 17, 4),'-',SUBSTR(HEX(loc_id), 21))) AS loc_id ,\nLOWER(CONCAT (SUBSTR(HEX(m_id), 1, 8),'-',SUBSTR(HEX(m_id), 9, 4),'-',SUBSTR(HEX(m_id), 13, 4),'-',SUBSTR(HEX(m_id), 17, 4),'-',SUBSTR(HEX(m_id), 21))) AS m_id ,\npp_created,\npp_modified,\nLOWER(CONCAT (SUBSTR(HEX(org_id), 1, 8),'-',SUBSTR(HEX(org_id), 9, 4),'-',SUBSTR(HEX(org_id), 13, 4),'-',SUBSTR(HEX(org_id), 17, 4),'-',SUBSTR(HEX(org_id), 21))) AS org_id ,\npp_account_number,\npp_is_address_valid,\npp_is_email_valid,\nLOWER(CONCAT (SUBSTR(HEX(adr_id), 1, 8),'-',SUBSTR(HEX(adr_id), 9, 4),'-',SUBSTR(HEX(adr_id), 13, 4),'-',SUBSTR(HEX(adr_id), 17, 4),'-',SUBSTR(HEX(adr_id), 21))) AS adr_id ,\npp_name_first,\npp_name_last,\npp_middle_name,\npp_dln,\npp_dln_l4,\npp_dl_state,\npp_birth_date,\npp_email,\npp_phone,\npp_full_name,\n\npp_deferred_collection_start_date,\npp_deferred_collection_end_date,\npp_deferred_collection_comment\nFROM abcbilling.payor_profile\nWHERE  pp_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND    pp_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "payor_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "payor_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "m_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pp_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "pp_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "pp_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "pp_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pp_account_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pp_account_number",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pp_is_address_valid",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "pp_is_address_valid",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "pp_is_email_valid",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "pp_is_email_valid",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "adr_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "adr_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pp_name_first",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pp_name_first",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pp_name_last",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pp_name_last",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pp_middle_name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pp_middle_name",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pp_dln",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pp_dln",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pp_dln_l4",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pp_dln_l4",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pp_dl_state",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pp_dl_state",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pp_birth_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "pp_birth_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "pp_email",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pp_email",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pp_phone",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pp_phone",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pp_full_name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pp_full_name",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pp_deferred_collection_start_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "pp_deferred_collection_start_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "pp_deferred_collection_end_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "pp_deferred_collection_end_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "pp_deferred_collection_comment",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pp_deferred_collection_comment",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ABCBILLING_PAYOR_PROFILE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-11T11:45:35Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_POS_BANK_HOLIDAY_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_POS_BANK_HOLIDAY",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Abcbilling_Pos_Bank_Holiday_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ABCBILLING_POS_BANK_HOLIDAY_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_POS_BANK_HOLIDAY",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT \nLOWER(CONCAT (SUBSTR(HEX(bh_id), 1, 8),'-',SUBSTR(HEX(bh_id), 9, 4),'-',SUBSTR(HEX(bh_id), 13, 4),'-',SUBSTR(HEX(bh_id), 17, 4),'-',SUBSTR(HEX(bh_id), 21))) AS bh_id ,\nbh_name,\nbh_date,\nbh_country_code,\nbh_created,\nbh_modified\nFROM abcbilling_pos.bank_holiday\nWHERE  bh_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND    bh_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "bh_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "bh_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "bh_name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "bh_name",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "bh_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "bh_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "bh_country_code",
+											"type": "String"
+										},
+										"sink": {
+											"name": "bh_country_code",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "bh_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "bh_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "bh_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "bh_modified",
+											"type": "DateTime"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING_POS",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ABCBILLING_POS_BANK_HOLIDAY_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_ABCBILLING_POS_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-14T14:09:12Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_POS_Client_Account_Entry_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_POS_CLIENT_ACCOUNT_ENTRY",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Abcbilling_Pos_Client_Account_Entry_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ABCBILLING_POS_CLIENT_ACCOUNT_ENTRY_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_POS_CLIENT_ACCOUNT_ENTRY",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT LOWER(CONCAT (SUBSTR(HEX(cae_id), 1, 8),'-',SUBSTR(HEX(cae_id), 9, 4),'-',SUBSTR(HEX(cae_id), 13, 4),'-',SUBSTR(HEX(cae_id), 17, 4),'-',SUBSTR(HEX(cae_id), 21))) AS cae_id ,\ncae_type,\ncae_transaction_type,\nLOWER(CONCAT (SUBSTR(HEX(client_id), 1, 8),'-',SUBSTR(HEX(client_id), 9, 4),'-',SUBSTR(HEX(client_id), 13, 4),'-',SUBSTR(HEX(client_id), 17, 4),'-',SUBSTR(HEX(client_id), 21))) AS client_id ,\nLOWER(CONCAT (SUBSTR(HEX(org_id), 1, 8),'-',SUBSTR(HEX(org_id), 9, 4),'-',SUBSTR(HEX(org_id), 13, 4),'-',SUBSTR(HEX(org_id), 17, 4),'-',SUBSTR(HEX(org_id), 21))) AS org_id ,\ncae_created,\ncae_modified,\nLOWER(CONCAT (SUBSTR(HEX(stlm_id), 1, 8),'-',SUBSTR(HEX(stlm_id), 9, 4),'-',SUBSTR(HEX(stlm_id), 13, 4),'-',SUBSTR(HEX(stlm_id), 17, 4),'-',SUBSTR(HEX(stlm_id), 21))) AS stlm_id ,\ncae_amount,\ncae_posting_date,\nLOWER(CONCAT (SUBSTR(HEX(cae_transaction_id), 1, 8),'-',SUBSTR(HEX(cae_transaction_id), 9, 4),'-',SUBSTR(HEX(cae_transaction_id), 13, 4),'-',SUBSTR(HEX(cae_transaction_id), 17, 4),'-',SUBSTR(HEX(cae_transaction_id), 21))) AS cae_transaction_id,\ncapm_type\t\nFROM abcbilling_pos.client_account_entry\nWHERE  cae_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND    cae_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "cae_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "cae_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "cae_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "cae_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "cae_transaction_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "cae_transaction_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "client_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "client_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "cae_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "cae_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "cae_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "cae_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "stlm_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "stlm_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "cae_amount",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "cae_amount",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "cae_posting_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "cae_posting_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "cae_transaction_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "cae_transaction_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "capm_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "capm_type",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING_POS",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ABCBILLING_POS_CLIENT_ACCOUNT_ENTRY_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_ABCBILLING_POS_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-23T13:58:09Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_POS_Client_Account_Payment_Method_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_POS_CLIENT_ACCOUNT_PAYMENT_METHOD",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[ABCBILLING_POS_CLIENT_ACCOUNT_PAYMENT_METHOD_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ABCBILLING_POS_CLIENT_ACCOUNT_PAYMENT_METHOD_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_POS_CLIENT_ACCOUNT_PAYMENT_METHOD",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT \nLOWER(CONCAT (SUBSTR(HEX(client_id), 1, 8),'-',SUBSTR(HEX(client_id), 9, 4),'-',SUBSTR(HEX(client_id), 13, 4),'-',SUBSTR(HEX(client_id), 17, 4),'-',SUBSTR(HEX(client_id), 21))) AS client_id ,\nLOWER(CONCAT (SUBSTR(HEX(pame_id), 1, 8),'-',SUBSTR(HEX(pame_id), 9, 4),'-',SUBSTR(HEX(pame_id), 13, 4),'-',SUBSTR(HEX(pame_id), 17, 4),'-',SUBSTR(HEX(pame_id), 21))) AS pame_id, \ncapm_type,\ncapm_created,\ncapm_modified,\nLOWER(CONCAT (SUBSTR(HEX(wea_id), 1, 8),'-',SUBSTR(HEX(wea_id), 9, 4),'-',SUBSTR(HEX(wea_id), 13, 4),'-',SUBSTR(HEX(wea_id), 17, 4),'-',SUBSTR(HEX(wea_id), 21))) AS wea_id\nFROM abcbilling_pos.client_account_payment_method\nWHERE  capm_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND    capm_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING_POS",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ABCBILLING_POS_CLIENT_ACCOUNT_PAYMENT_METHOD_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_ABCBILLING_POS_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-14T14:09:12Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_POS_Client_Account_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_Pos_Client_Account",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Abcbilling_Pos_Client_Account_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ABCBILLING_Pos_Client_Account_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_Pos_Client_Account",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT LOWER(CONCAT (SUBSTR(HEX(client_id), 1, 8),'-',SUBSTR(HEX(client_id), 9, 4),'-',SUBSTR(HEX(client_id), 13, 4),'-',SUBSTR(HEX(client_id), 17, 4),'-',SUBSTR(HEX(client_id), 21))) AS client_id ,\n       LOWER(CONCAT (SUBSTR(HEX(org_id), 1, 8),'-',SUBSTR(HEX(org_id), 9, 4),'-',SUBSTR(HEX(org_id), 13, 4),'-',SUBSTR(HEX(org_id), 17, 4),'-',SUBSTR(HEX(org_id), 21))) AS org_id, \n\t\tca_next_settlement_date,\n\t    ca_created,\n\t    ca_modified,\t\t\n\t   LOWER(CONCAT (SUBSTR(HEX(loc_id), 1, 8),'-',SUBSTR(HEX(loc_id), 9, 4),'-',SUBSTR(HEX(loc_id), 13, 4),'-',SUBSTR(HEX(loc_id), 17, 4),'-',SUBSTR(HEX(loc_id), 21))) AS loc_id,\n\t   ca_holdback_flat_rate,\n\t   ca_holdback_percentage,\n\t   ca_status\nFROM abcbilling_pos.client_account\nWHERE  ca_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND    ca_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\n\n\n\n\n\n\n",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "client_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "client_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ca_next_settlement_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "ca_next_settlement_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ca_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "ca_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ca_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "ca_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ca_holdback_flat_rate",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "ca_holdback_flat_rate",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "ca_holdback_percentage",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "ca_holdback_percentage",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "ca_status",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ca_status",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING_POS",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ABCBILLING_POS_Client_Account_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_ABCBILLING_POS_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-23T13:58:09Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_POS_Client_Profile_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_POS_Client_Profile",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Abcbilling_Pos_Client_Profile_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ABCBILLING_Pos_Client_Profile_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_POS_Client_Profile",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT \nLOWER(CONCAT (SUBSTR(HEX(client_id), 1, 8),'-',SUBSTR(HEX(client_id), 9, 4),'-',SUBSTR(HEX(client_id), 13, 4),'-',SUBSTR(HEX(client_id), 17, 4),'-',SUBSTR(HEX(client_id), 21))) AS client_id\n,LOWER(CONCAT (SUBSTR(HEX(loc_id), 1, 8),'-',SUBSTR(HEX(loc_id), 9, 4),'-',SUBSTR(HEX(loc_id), 13, 4),'-',SUBSTR(HEX(loc_id), 17, 4),'-',SUBSTR(HEX(loc_id), 21))) AS loc_id\n,tzl_id\n,LOWER(CONCAT (SUBSTR(HEX(merc_id), 1, 8),'-',SUBSTR(HEX(merc_id), 9, 4),'-',SUBSTR(HEX(merc_id), 13, 4),'-',SUBSTR(HEX(merc_id), 17, 4),'-',SUBSTR(HEX(merc_id), 21))) AS merc_id\n,cp_created\n,cp_modified\n,LOWER(CONCAT (SUBSTR(HEX(org_id), 1, 8),'-',SUBSTR(HEX(org_id), 9, 4),'-',SUBSTR(HEX(org_id), 13, 4),'-',SUBSTR(HEX(org_id), 17, 4),'-',SUBSTR(HEX(org_id), 21))) AS org_id\n,loc_language\n,loc_region\n,loc_variant\n,cp_name\n,cp_processing_mode\n,cp_country_code\n,cp_type\n,cp_is_new_pricing_model_enabled\n,cp_is_communication_fee_allowed\n,cp_is_fee_per_invoice_billing_enabled\n,cp_is_cost_plus_pricing_model_enabled\nFROM abcbilling_pos.client_profile\nWHERE cp_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND cp_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "client_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "client_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "tzl_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "tzl_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "merc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "merc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "cp_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "cp_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "cp_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "cp_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_language",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_language",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_region",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_region",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_variant",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_variant",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "cp_name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "cp_name",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "cp_processing_mode",
+											"type": "String"
+										},
+										"sink": {
+											"name": "cp_processing_mode",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "cp_country_code",
+											"type": "String"
+										},
+										"sink": {
+											"name": "cp_country_code",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "cp_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "cp_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "cp_is_new_pricing_model_enabled",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "cp_is_new_pricing_model_enabled",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "cp_is_communication_fee_allowed",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "cp_is_communication_fee_allowed",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "cp_is_fee_per_invoice_billing_enabled",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "cp_is_fee_per_invoice_billing_enabled",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "cp_is_cost_plus_pricing_model_enabled",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "cp_is_cost_plus_pricing_model_enabled",
+											"type": "Boolean"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING_POS",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ABCBILLING_POS_CLIENT_Profile_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_ABCBILLING_POS_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-23T13:58:09Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_POS_Client_Transaction_Fee_Config_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_Client_Transaction_Fee_Config",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Abcbilling_POS_Client_Transaction_Fee_Config_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ABCBILLING_POS_Client_Transaction_Fee_Config_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_Client_Transaction_Fee_Config",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT LOWER(CONCAT (SUBSTR(HEX(ctfc_id), 1, 8),'-',SUBSTR(HEX(ctfc_id), 9, 4),'-',SUBSTR(HEX(ctfc_id), 13, 4),'-',SUBSTR(HEX(ctfc_id), 17, 4),'-',SUBSTR(HEX(ctfc_id), 21))) AS ctfc_id ,\nctfc_type,\nctfc_start_date,\nctfc_member_start_date,\nctfc_end_date,\nctfc_flat_amount,\nctfc_percentage,\nLOWER(CONCAT (SUBSTR(HEX(org_id), 1, 8),'-',SUBSTR(HEX(org_id), 9, 4),'-',SUBSTR(HEX(org_id), 13, 4),'-',SUBSTR(HEX(org_id), 17, 4),'-',SUBSTR(HEX(org_id), 21))) AS org_id,\nctfc_created,\nctfc_modified,\t  \nLOWER(CONCAT (SUBSTR(HEX(loc_id), 1, 8),'-',SUBSTR(HEX(loc_id), 9, 4),'-',SUBSTR(HEX(loc_id), 13, 4),'-',SUBSTR(HEX(loc_id), 17, 4),'-',SUBSTR(HEX(loc_id), 21))) AS loc_id  \t\nFROM abcbilling_pos.client_transaction_fee_config\nWHERE  ctfc_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND    ctfc_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "ctfc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ctfc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ctfc_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ctfc_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ctfc_start_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "ctfc_start_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ctfc_member_start_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "ctfc_member_start_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ctfc_end_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "ctfc_end_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ctfc_flat_amount",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "ctfc_flat_amount",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "ctfc_percentage",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "ctfc_percentage",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ctfc_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "ctfc_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ctfc_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "ctfc_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING_POS",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ABCBILLING_POS_CLIENT_TRANSACTION_FEE_CONFIG_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_ABCBILLING_POS_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-23T13:58:09Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_POS_Client_Transaction_Fee_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_POS_Client_Transaction_Fee",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Abcbilling_POS_Client_Transaction_Fee_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ABCBILLING_POS_Client_Transaction_Fee_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_POS_Client_Transaction_Fee",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT \nLOWER(CONCAT (SUBSTR(HEX(ctf_id), 1, 8),'-',SUBSTR(HEX(ctf_id), 9, 4),'-',SUBSTR(HEX(ctf_id), 13, 4),'-',SUBSTR(HEX(ctf_id), 17, 4),'-',SUBSTR(HEX(ctf_id), 21))) AS ctf_id\n,ctf_assessment_date\n,ctf_amount\n,LOWER(CONCAT (SUBSTR(HEX(ctfc_id), 1, 8),'-',SUBSTR(HEX(ctfc_id), 9, 4),'-',SUBSTR(HEX(ctfc_id), 13, 4),'-',SUBSTR(HEX(ctfc_id), 17, 4),'-',SUBSTR(HEX(ctfc_id), 21))) AS ctfc_id\n,LOWER(CONCAT (SUBSTR(HEX(client_id), 1, 8),'-',SUBSTR(HEX(client_id), 9, 4),'-',SUBSTR(HEX(client_id), 13, 4),'-',SUBSTR(HEX(client_id), 17, 4),'-',SUBSTR(HEX(client_id), 21))) AS client_id\n,LOWER(CONCAT (SUBSTR(HEX(org_id), 1, 8),'-',SUBSTR(HEX(org_id), 9, 4),'-',SUBSTR(HEX(org_id), 13, 4),'-',SUBSTR(HEX(org_id), 17, 4),'-',SUBSTR(HEX(org_id), 21))) AS org_id\n,ctf_created\n,ctf_modified\n,ctf_number\n,LOWER(CONCAT (SUBSTR(HEX(ctf_ref_transaction_id), 1, 8),'-',SUBSTR(HEX(ctf_ref_transaction_id), 9, 4),'-',SUBSTR(HEX(ctf_ref_transaction_id), 13, 4),'-',SUBSTR(HEX(ctf_ref_transaction_id), 17, 4),'-',SUBSTR(HEX(ctf_ref_transaction_id), 21))) AS ctf_ref_transaction_id\n,ctf_ref_transaction_type\n,LOWER(CONCAT (SUBSTR(HEX(agrm_id), 1, 8),'-',SUBSTR(HEX(agrm_id), 9, 4),'-',SUBSTR(HEX(agrm_id), 13, 4),'-',SUBSTR(HEX(agrm_id), 17, 4),'-',SUBSTR(HEX(agrm_id), 21))) AS agrm_id\nFROM abcbilling_pos.client_transaction_fee\nWHERE ctf_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND ctf_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "ctf_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ctf_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ctf_assessment_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "ctf_assessment_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ctf_amount",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "ctf_amount",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "ctfc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ctfc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "client_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "client_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ctf_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "ctf_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ctf_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "ctf_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "ctf_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ctf_number",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ctf_ref_transaction_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ctf_ref_transaction_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ctf_ref_transaction_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "ctf_ref_transaction_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "agrm_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "agrm_id",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING_POS",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ABCBILLING_POS_CLIENT_TRANSACTION_FEE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_ABCBILLING_POS_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-23T13:58:09Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_POS_Deposit_Event_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_POS_Deposit_Event",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Abcbilling_Pos_Deposit_Event_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ABCBILLING_POS_Deposit_Event_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_POS_Deposit_Event",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT\n\tLOWER(CONCAT (SUBSTR(HEX(de_id), 1, 8),'-',SUBSTR(HEX(de_id), 9, 4),'-',SUBSTR(HEX(de_id), 13, 4),'-',SUBSTR(HEX(de_id), 17, 4),'-',SUBSTR(HEX(de_id), 21))) AS de_id\n\t,LOWER(CONCAT (SUBSTR(HEX(dep_id), 1, 8),'-',SUBSTR(HEX(dep_id), 9, 4),'-',SUBSTR(HEX(dep_id), 13, 4),'-',SUBSTR(HEX(dep_id), 17, 4),'-',SUBSTR(HEX(dep_id), 21))) AS dep_id\n\t,de_type\n\t,de_date\n\t,de_data\n\t,de_created\n\t,de_modified\nFROM abcbilling_pos.deposit_event\nWHERE de_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND de_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\n",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "de_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "de_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "dep_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "dep_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "de_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "de_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "de_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "de_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "de_data",
+											"type": "String"
+										},
+										"sink": {
+											"name": "de_data",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "de_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "de_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "de_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "de_modified",
+											"type": "DateTime"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING_POS",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ABCBILLING_POS_DEPOSIT_EVENT_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_ABCBILLING_POS_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-23T13:58:09Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_POS_Deposit_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_POS_DEPOSIT",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Abcbilling_Pos_Deposit_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ABCBILLING_POS_DEPOSIT_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_POS_DEPOSIT",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT \n\tLOWER(CONCAT (SUBSTR(HEX(dep_id), 1, 8),'-',SUBSTR(HEX(dep_id), 9, 4),'-',SUBSTR(HEX(dep_id), 13, 4),'-',SUBSTR(HEX(dep_id), 17, 4),'-',SUBSTR(HEX(dep_id), 21))) AS dep_id\n\t,LOWER(CONCAT (SUBSTR(HEX(org_id), 1, 8),'-',SUBSTR(HEX(org_id), 9, 4),'-',SUBSTR(HEX(org_id), 13, 4),'-',SUBSTR(HEX(org_id), 17, 4),'-',SUBSTR(HEX(org_id), 21))) AS org_id\n\t,LOWER(CONCAT (SUBSTR(HEX(loc_id), 1, 8),'-',SUBSTR(HEX(loc_id), 9, 4),'-',SUBSTR(HEX(loc_id), 13, 4),'-',SUBSTR(HEX(loc_id), 17, 4),'-',SUBSTR(HEX(loc_id), 21))) AS loc_id\n\t,LOWER(CONCAT (SUBSTR(HEX(client_id), 1, 8),'-',SUBSTR(HEX(client_id), 9, 4),'-',SUBSTR(HEX(client_id), 13, 4),'-',SUBSTR(HEX(client_id), 17, 4),'-',SUBSTR(HEX(client_id), 21))) AS client_id\n\t,LOWER(CONCAT (SUBSTR(HEX(stlm_id), 1, 8),'-',SUBSTR(HEX(stlm_id), 9, 4),'-',SUBSTR(HEX(stlm_id), 13, 4),'-',SUBSTR(HEX(stlm_id), 17, 4),'-',SUBSTR(HEX(stlm_id), 21))) AS stlm_id\n\t,dep_amount\n\t,dep_status\n\t,dep_payment_gateway_transaction_id\n\t,dep_posting_date\n\t,dep_created\n\t,dep_modified\n\t,dep_number\n\t,dep_due_date\n\t,dep_retry_count\n\t,tran_unique_transaction_number\n\t,dep_type\n\t,LOWER(CONCAT (SUBSTR(HEX(pame_id), 1, 8),'-',SUBSTR(HEX(pame_id), 9, 4),'-',SUBSTR(HEX(pame_id), 13, 4),'-',SUBSTR(HEX(pame_id), 17, 4),'-',SUBSTR(HEX(pame_id), 21))) AS pame_id\n\t,LOWER(CONCAT (SUBSTR(HEX(bd_id), 1, 8),'-',SUBSTR(HEX(bd_id), 9, 4),'-',SUBSTR(HEX(bd_id), 13, 4),'-',SUBSTR(HEX(bd_id), 17, 4),'-',SUBSTR(HEX(bd_id), 21))) AS bd_id\nFROM abcbilling_pos.deposit\nWHERE dep_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND dep_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "dep_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "dep_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "client_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "client_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "stlm_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "stlm_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "dep_amount",
+											"type": "Decimal"
+										},
+										"sink": {
+											"name": "dep_amount",
+											"type": "Decimal"
+										}
+									},
+									{
+										"source": {
+											"name": "dep_status",
+											"type": "String"
+										},
+										"sink": {
+											"name": "dep_status",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "dep_payment_gateway_transaction_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "dep_payment_gateway_transaction_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "dep_posting_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "dep_posting_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "dep_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "dep_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "dep_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "dep_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "dep_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "dep_number",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "dep_due_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "dep_due_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "dep_retry_count",
+											"type": "Int16"
+										},
+										"sink": {
+											"name": "dep_retry_count",
+											"type": "Int16"
+										}
+									},
+									{
+										"source": {
+											"name": "tran_unique_transaction_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "tran_unique_transaction_number",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "dep_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "dep_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "bd_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "bd_id",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING_POS",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ABCBILLING_POS_DEPOSIT_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_ABCBILLING_POS_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-23T13:58:09Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_POS_FEE_SCHEDULE_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_Fee_SCHEDULE",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[ABCBILLING_POS_FEE_SCHEDULE_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ABCBILLING_POS_FEE_SCHEDULE_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_Fee_SCHEDULE",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT LOWER(CONCAT (SUBSTR(HEX(fs_id), 1, 8),'-',SUBSTR(HEX(fs_id), 9, 4),'-',SUBSTR(HEX(fs_id), 13, 4),'-',SUBSTR(HEX(fs_id), 17, 4),'-',SUBSTR(HEX(fs_id), 21))) AS fs_id\n      ,fs_frequency\n      ,fs_first_due_date\n      ,fs_number_of_fees\n      ,fs_assessment_count\n      ,fs_next_scheduled_fee_date\t\n      ,LOWER(CONCAT (SUBSTR(HEX(sfc_id), 1, 8),'-',SUBSTR(HEX(sfc_id), 9, 4),'-',SUBSTR(HEX(sfc_id), 13, 4),'-',SUBSTR(HEX(sfc_id), 17, 4),'-',SUBSTR(HEX(sfc_id), 21))) AS sfc_id\n      ,LOWER(CONCAT (SUBSTR(HEX(loc_id), 1, 8),'-',SUBSTR(HEX(loc_id), 9, 4),'-',SUBSTR(HEX(loc_id), 13, 4),'-',SUBSTR(HEX(loc_id), 17, 4),'-',SUBSTR(HEX(loc_id), 21))) AS loc_id\n      ,LOWER(CONCAT (SUBSTR(HEX(org_id), 1, 8),'-',SUBSTR(HEX(org_id), 9, 4),'-',SUBSTR(HEX(org_id), 13, 4),'-',SUBSTR(HEX(org_id), 17, 4),'-',SUBSTR(HEX(org_id), 21))) AS org_id\n      ,fs_created\n      ,fs_modified\t\nFROM abcbilling_pos.fee_schedule\nWHERE  fs_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND    fs_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "fs_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "fs_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "fs_frequency",
+											"type": "String"
+										},
+										"sink": {
+											"name": "fs_frequency",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "fs_first_due_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "fs_first_due_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "fs_number_of_fees",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "fs_number_of_fees",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"name": "fs_assessment_count",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "fs_assessment_count",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"name": "fs_next_scheduled_fee_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "fs_next_scheduled_fee_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "sfc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "sfc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "fs_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "fs_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "fs_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "fs_modified",
+											"type": "DateTime"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING_POS",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ABCBILLING_POS_FEE_SCHEDULE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_ABCBILLING_POS_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-23T13:58:09Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ABCBILLING_POS_PAYMENT_METHOD_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ABCBILLING_POS_PAYMENT_METHOD",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Abcbilling_Pos_Payment_Method_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ABCBILLING_POS_PAYMENT_METHOD_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ABCBILLING_POS_PAYMENT_METHOD",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT \nLOWER(CONCAT (SUBSTR(HEX(pame_id), 1, 8),'-',SUBSTR(HEX(pame_id), 9, 4),'-',SUBSTR(HEX(pame_id), 13, 4),'-',SUBSTR(HEX(pame_id), 17, 4),'-',SUBSTR(HEX(pame_id), 21))) AS pame_id ,\npame_type,\npame_account_holder,\npame_created,\npame_modified,\nLOWER(CONCAT (SUBSTR(HEX(org_id), 1, 8),'-',SUBSTR(HEX(org_id), 9, 4),'-',SUBSTR(HEX(org_id), 13, 4),'-',SUBSTR(HEX(org_id), 17, 4),'-',SUBSTR(HEX(org_id), 21))) AS org_id,\nLOWER(CONCAT (SUBSTR(HEX(tok_id), 1, 8),'-',SUBSTR(HEX(tok_id), 9, 4),'-',SUBSTR(HEX(tok_id), 13, 4),'-',SUBSTR(HEX(tok_id), 17, 4),'-',SUBSTR(HEX(tok_id), 21))) AS tok_id,\nLOWER(CONCAT (SUBSTR(HEX(client_id), 1, 8),'-',SUBSTR(HEX(client_id), 9, 4),'-',SUBSTR(HEX(client_id), 13, 4),'-',SUBSTR(HEX(client_id), 17, 4),'-',SUBSTR(HEX(client_id), 21))) AS client_id,\npame_brand,\nLOWER(CONCAT (SUBSTR(HEX(loc_id), 1, 8),'-',SUBSTR(HEX(loc_id), 9, 4),'-',SUBSTR(HEX(loc_id), 13, 4),'-',SUBSTR(HEX(loc_id), 17, 4),'-',SUBSTR(HEX(loc_id), 21))) AS loc_id,\npame_status,\npame_is_wire_transfer_type\nFROM abcbilling_pos.payment_method\nWHERE  pame_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND    pame_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "pame_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_account_holder",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_account_holder",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "pame_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "pame_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "tok_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "tok_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "client_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "client_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_brand",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_brand",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_status",
+											"type": "String"
+										},
+										"sink": {
+											"name": "pame_status",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "pame_is_wire_transfer_type",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "pame_is_wire_transfer_type",
+											"type": "Boolean"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ABCBILLING_POS",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ABCBILLING_POS_PAYMENT_METHOD_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_ABCBILLING_POS_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-11-15T14:59:40Z"
+			},
+			"dependsOn": []
+		}
+	]
+}

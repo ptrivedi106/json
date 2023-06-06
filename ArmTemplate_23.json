@@ -1,0 +1,1883 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "PlanetFitnessDF"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_SALESDISCOUNTTYPES_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_SALESDISCOUNTTYPES_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_SALESTAXRATES_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_SALESTAXRATES_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_SERVICEPROVIDERLOCATIONS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_SERVICEPROVIDERLOCATIONS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_SERVICEPROVIDERLOCATIONS_INCR_DATALOAD')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SPL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "SPL_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "SPL_ACTIVE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_TRANSACTION_PREFIX",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ABC_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RECEIPT_HEADER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RECEIPT_FOOTER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RECEIPT_HEADER_PRODUCT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RECEIPT_FOOTER_PRODUCT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RECEIPT_HEADER_SERVICE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RECEIPT_FOOTER_SERVICE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_PICTURE_TIMEOUT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SPL_SHOW_ELECTRONIC_AGREE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_DEFAULT_CONTRACT_LENGTH",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SPL_DEFAULT_TERM_LENGTH",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SPL_DEFAULT_AUTO_LENGTH",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SPL_DEF_PROSPECT_CONTRACT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SPL_DEF_PROSPECT_VISITS",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SPL_ALLOW_SECONDARY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_AUTO_RENEW_OPEN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_AUTO_RENEW_TERM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MANUAL_RENEWAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_NO_RENEWAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RENEWAL_OPTION",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RENEW_CASH_PRICE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "SPL_RENEW_COUPON_PRICE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "SPL_RENEW_DRAFT_PRICE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "SPL_RENEWAL_DURATION",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SPL_CA_NUM_MONTHS",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SPL_CA_PROCESS_DAY",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SPL_CA_BILL_VIA_ABC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_CONFIRM_FIRST_SERVICE_USE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ATL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MANAGE_MEMBERSHIP_TYPES",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MANAGE_BARCODES",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_DEFAULT_ABC_MANAGED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_DEFAULT_GENDER",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SPL_LOCK_SCHEDULE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_SHORT_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_COUPON_DIFF",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "SPL_COUPON_DIFF_PRIMARY_ONLY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ALLOW_CLUB_MANAGE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ALLOW_FAST_ADD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_PROSPECT_TO_FAST_ADD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_SEND_UPDATES_TO_HOST",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MEDALLIA_EXPORT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_PHYSICAL_LOCATION",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_CALENDAR_START_DAY",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SPL_OVERRIDE_PRICE_REASON",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "SPL_WAIVE_SALES_TAX_REASON",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "SPL_VOID_REASON",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "SPL_DRAWER_POP_REASON",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "SPL_RETURN_REASON",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "SPL_SERVICE_USAGE_SIGNATURE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_VOID_SIGNATURE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_DEAD_COLUMN_1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RETURNS_SIGNATURE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ENABLE_HOLD_QUEUE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_EMAIL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_EMAIL_ALTERNATE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_URL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ADDRESS_1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ADDRESS_2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_CITY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ZIP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_PHONE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_PHONE_EXT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_FAX",
+						"type": "nvarchar"
+					},
+					{
+						"name": "APP_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "B_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CCPT_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SAI_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SP_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "STL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TZL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_CA_COPY_ABC_BILLING",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_DROP_ADD_REASON",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "PDOG_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MAX_BABYSITTING",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SPL_MAIL_SERVER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MAIL_USER_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MAIL_USER_PASSWORD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MAIL_ADDRESS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MAIL_PORT_NUMBER",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "SPL_MAIL_USES_SSL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_CHECK_IN_RECENT_LIST",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_FIXED_MONTHLY_TO_POS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_AUTO_DELETE_UNFUNDED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ALLOW_COUPON_BOOK",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_POS_MEMBER_REQUIRED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_FAST_ADD_DEFAULT_PROSPECT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RECORD_STATISTICS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ENABLE_APPROVAL_QUEUE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ENABLE_POS_QUEUE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_CARRY_COMMISSIONS",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "MFG_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_DEFAULT_EAE_ALLOW_CA",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "SPL_DEFAULT_EAE_CA_LIMIT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "SPL_EAE_ABC_ID_START",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_PREFILL_BARCODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MISC_1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MISC_2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MISC_3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MISC_4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MISC_5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_AUTO_PIN_CALENDAR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ALLOW_FIXED_MONTHLY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ALLOW_OPEN_MONTHLY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ALLOW_OPEN_PACKAGE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_EAE_COPY_CA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CAPM_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_SEND_EMAIL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_AUTO_CA_RUN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_AUTO_CA_MINIMUM",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "SPL_AUTO_CA_LAST_RUN_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "SPL_FIXED_MONTHLY_EVENTS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_OPEN_PACKAGE_TO_POS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_OPEN_MONTHLY_TO_POS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_SEND_SMS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RENEW_REWRITE_OTHER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MANAGE_SALESPERSON",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ONLINE_APPOINTMENT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ONLINE_CLASS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_QUICK_ENROLL_EVENT_TYPE",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "PDOG_ID_INCREMENTAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ZIP_SWIPE_REQUIRED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ZIP_SWIPE_PREFILLED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ZIP_MANUAL_REQUIRED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ZIP_MANUAL_PREFILLED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ZIP_ONFILE_REQUIRED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ZIP_ONFILE_PREFILLED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_NON_NUMERIC_ABC_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MEMBER_FACE_HOURS_BACK",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "SPL_MEMBER_FACE_HOURS_FORWARD",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "SPL_MEMBER_OVERBOOK",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "SPL_OPP_LOW_VALUE",
+						"type": "decimal",
+						"precision": 3,
+						"scale": 0
+					},
+					{
+						"name": "SPL_OPP_MEDIUM_VALUE",
+						"type": "decimal",
+						"precision": 3,
+						"scale": 0
+					},
+					{
+						"name": "SPL_OPP_HIGH_VALUE",
+						"type": "decimal",
+						"precision": 3,
+						"scale": 0
+					},
+					{
+						"name": "SPL_OPP_LOW_TYPE",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "SPL_OPP_MEDIUM_TYPE",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "SPL_OPP_HIGH_TYPE",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "SPL_QB_URL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_QB_USERNAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_QB_PASSWORD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_QB_CUSTOMERS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_QB_SUMMARY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_QB_LAST_RUN_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "QBET_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_QB_CONFIRMED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_QB_CONFIRMED_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "SPL_FIXED_MONTHLY_SERVICE_HOLD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MANAGE_MASTER_AGREEMENT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_FIXED_MONTHLY_AUTO_DISABLE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_EMP_ACCESS_CODE_SERVICE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MEM_ACCESS_CODE_SERVICE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MAX_MEM_CODE_FAILURES",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "AT_ID_FAST_ADD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_WARNING_ON_MINOR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_QB_TRACK_EXPENSES",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_QB_ACCOUNTS_CONFIRMED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_CA_ACTIVE_MEMBER_REQUIRED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_CHECK_IN_ABC_STATUS_REASON",
+						"type": "nvarchar"
+					},
+					{
+						"name": "APP_ID_WEB",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ONLINE_CREATE_AGREEMENT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "RSP_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RSP_REQUIRED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MEMBER_ACCESS_CODE_EVENT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_EMPLOYEE_ACCESS_CODE_EVENT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CRTP_ID_REPEAT_EMPLOYEE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CRTP_ID_REPEAT_LOCATION",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_COPY_CA_ABC_BILLING_EAE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_DASHBOARD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_LOCK_SCHEDULE_TIME",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "SPL_ONLINE_PROSPECT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MICO_ALERT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MICO_ALERT_TEXT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ENABLE_PREAPPROVAL_QUEUE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "APM_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_EAE_SKIP_MONTHS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_PRESALE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_SPECIAL_HANDLE_MINORS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ALLOW_MINOR_SIGNUP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MINOR_AGE",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "SPL_MINOR_DISCLAIMER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_COMPARE_CC_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_COMPARE_CC_DISCLAIMER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ONLINE_CASH",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AEQ_ID_POS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AEQ_ID_MINOR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AEQ_ID_CC_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RS_BILLING_DEFAULT",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "SPL_LOCKER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_LOCKER_EXPIRATION_REQUIRED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_AGREEMENT_QUEUE_SORT_ASC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_USE_2010_EAE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "HPC_ID_SINGLE_PAY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_EAE_PAYMENTS_VISIBLE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_EAE_FEES_VISIBLE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_EAE_ALLOW_MINOR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MODIFIED_DW",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "CTL_ID_BILLING",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_DEAD_COLUMN_2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_COMM_DAYS_LAG",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "CFRQ_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_EMAIL_AGREEMENT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_EMAIL_RECURRING_SERVICE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_COMM_START_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "D_ID_EAE_SCH",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ET_ID_EAE_SCH",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ETL_ID_EAE_SCH",
+						"type": "nvarchar"
+					},
+					{
+						"name": "C_ID_EAE_COMPLETE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_WEEK_EAE_SCH",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_HOLD_FREE_RECURRING",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_EAE_FIRST_DUE_DATE_NXT_MTH",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_FORCE_OPPORTUNITY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_GIFT_CARD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PF_ID_MULTI_PAY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MULTI_PAY_AMOUNT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "SPL_2010_EAE_SKIP_APPROVAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_SWITCH_BILLING_DAYS",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "SECTOR_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MICO_VERSION",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "SPL_ADP_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RECUR_PAID_IN_FULL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RECUR_DEFERRED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RECUR_CUSTOM_INTERVAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RECUR_PAID_IN_FULL_POS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RECUR_DEFERRED_POS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RECUR_CUSTOM_INTERVAL_POS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_RECEIPT_EMPLOYEE_FULL_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_EVENT_WAITLIST",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_EVENT_COMM_POST_DISCOUNT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_EMPLOYEE_PORTAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ONLINE_SIGNUP_DRAFT_METHOD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_SHOW_FEES_ONLINE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_CANCEL_BY_DAYS_ACTIVE",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "SPL_CANCEL_BY_DAYS_PRESALE",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "SPL_POS_SIGN_LIMIT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "SPL_LATITUDE",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 6
+					},
+					{
+						"name": "SPL_LONGITUDE",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 6
+					},
+					{
+						"name": "SPL_FACEBOOK",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_TWITTER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_SHOW_RS_UNFUNDED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ONLINE_SIGNATURE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ONLINE_LOCATION_LIST",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_PROSPECT_TERMS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_AUTO_CANCEL_PEND_POS_DEF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ID_MICO_DEFAULT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ALTERNATE_BILLING_DEFAULT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_VERIFY_EMP_CLOCK_IN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_VERIFY_EMP_CLOCK_OUT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_HIDE_TIME_MFCE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_DEFAULT_SET_BILL_ON_ADD_CC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ENCRYPT_END_TO_END",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_QUICK_CASH_RECEIPT_EMAIL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_QUICK_CASH_RECEIPT_PRINT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_TOTAL_RECEIPT_EMAIL_DEFAUL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_TOTAL_RECEIPT_PRINT_DEFAUL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "REG_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_VER_EMP_CLOCK_IN_BRK",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_VER_EMP_CLOCK_OUT_BRK",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ADD_ON_SIGNATURE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_VERIFY_POS_COF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_VERIFY_POS_CA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_VERIFY_POS_PREPAY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_DEFAULT_COF_ON_ADD_CC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_DEFAULT_CA_ON_ADD_CC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ADD_ON_PAYMENT_PLANS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_BILLING_MESSAGE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_COF_MESSAGE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_CA_MESSAGE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_WARN_EAE_BANK_TO_CC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ALT_PAY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ALT_PAY_DAYS_LATE",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "SPL_ALT_PAY_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_MICO_PAY_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ALT_MESSAGE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ALLOW_MEMBER_TRANSFER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_TRANSFER_MESSAGE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_VERIFY_MEM_RS_CREATE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_REQ_COMMENT_CANCEL_NC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_CA_MICO_HISTORY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_EAE_DUP_MEM_CHK_REQ",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_STORE_DECLINED_CHECK_INS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_EMV",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "NAST_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CGI_ID_DONATION_API",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CGI_ID_DONATION_VFN",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_SERVICEPROVIDERLOCATIONS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_SERVICEPROVIDERS_INCR_DATALOAD')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_SERVICEPROVIDERS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_STATELOOKUP')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_STATELOOKUP"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_STATIONLOCATIONS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_STATIONLOCATIONS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_STATIONLOCATIONS_INCR_DATALOAD')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SLOC_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SLOC_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "SLOC_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "SLOC_ACTIVE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SLOC_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SLOC_ABC_CODE",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_STATIONLOCATIONS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_STATIONSETTINGS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_STATIONSETTINGS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_TIMETRACKINGBREAKS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_TIMETRACKINGBREAKS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_TIMETRACKING_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_TIMETRACKING_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_USERDEFINEDFIELDSVALUES_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_USERDEFINEDFIELDVALUES_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_USERDEFINEDFIELDS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_USERDEFINEDFIELDS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGRCM_ABCBILLING_CATEGORY_TAX_CODE_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ABCBILLING_CATEGORY_TAX_CODE_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGRCM_ABCBILLING_CLIENT_PROFILE_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ABCBILLING_CLIENT_PROFILE_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGRCM_ABCBILLING_CLIENT_TRANSACTION_FEE_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ABCBILLING_CLIENT_TRANSACTION_FEE_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGRCM_ORGANIZATION_NOTE_NOTE_ACTION_CODE_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ORGANIZATION_NOTE_NOTE_ACTION_CODE_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGRCM_ORGANIZATION_NOTE_REFERENCE_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ORGANIZATION_NOTE_REFERENCE_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SVN_DW_EFT_RECONCILIATION_DTL')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "ETL_DATE_KEY",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "ETL_DATETIME",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CLUB_NUMBER_I",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "CBCLB",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "CBNME",
+						"type": "varchar"
+					},
+					{
+						"name": "CGGRPM",
+						"type": "varchar"
+					},
+					{
+						"name": "CGNMEM",
+						"type": "varchar"
+					},
+					{
+						"name": "CWCLB",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "CWMBR",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "CWTYP",
+						"type": "varchar"
+					},
+					{
+						"name": "CWMDE",
+						"type": "varchar"
+					},
+					{
+						"name": "CWFRQ",
+						"type": "varchar"
+					},
+					{
+						"name": "CWSTC",
+						"type": "varchar"
+					},
+					{
+						"name": "CWSTD",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "CWBDT",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "CWNDD",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "CWAGE",
+						"type": "varchar"
+					},
+					{
+						"name": "CWTF4",
+						"type": "varchar"
+					},
+					{
+						"name": "CNFNM",
+						"type": "varchar"
+					},
+					{
+						"name": "CNMI",
+						"type": "varchar"
+					},
+					{
+						"name": "CNLNM",
+						"type": "varchar"
+					},
+					{
+						"name": "CNMTC",
+						"type": "varchar"
+					},
+					{
+						"name": "CDDTE",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "CDCDA",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "CDTYP",
+						"type": "varchar"
+					},
+					{
+						"name": "CDWAV",
+						"type": "varchar"
+					},
+					{
+						"name": "CDCCTCODE",
+						"type": "varchar"
+					},
+					{
+						"name": "STDSC",
+						"type": "varchar"
+					},
+					{
+						"name": "CIDTE",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "NEXT_INVOICE_DATE",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "CNDOB_YYYYMMDD",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "AS_OF",
+						"type": "date"
+					}
+				],
+				"typeProperties": {
+					"schema": "DW",
+					"table": "DW_EFT_RECONCILIATION_DTL"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SVN_DW_PF_ACTIVE_MEMBERS_SMRY')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "ETL_DATE_KEY",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 0
+					},
+					{
+						"name": "CLUB_NUMBER_I",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "ACTIVE_MEMBERS",
+						"type": "varchar"
+					},
+					{
+						"name": "TOTAL_COUNT",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "TOTAL_AMOUNT",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "AS_OF",
+						"type": "date"
+					}
+				],
+				"typeProperties": {
+					"schema": "DW",
+					"table": "PF_ACTIVE_MEMBERS_SMRY"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

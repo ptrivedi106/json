@@ -1,0 +1,6629 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "PlanetFitnessDF"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_CTFIL_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "CTCLB",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CTMBR",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CTSEQ",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CTDTE",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CTCEN",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "CTTIM",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CTUSR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTCDE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTTYP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTGRP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTCTA",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CTSTA",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CTCFA",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CTREF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTCBA",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CTCOM",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CTBDT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CTBCH",
+						"type": "decimal",
+						"precision": 3,
+						"scale": 0
+					},
+					{
+						"name": "CTR1F",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTR1S",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CT1DD",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CTDPF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTBPF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTBFWDDATE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 0
+					},
+					{
+						"name": "CTFLAG1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTFLAG2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTFLAG3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTFLAG4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTFLAG5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "IS_DELETED",
+						"type": "bit"
+					},
+					{
+						"name": "SOURCE_SYSTEM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DW_CHANGE_DATE",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "HASHKEY",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgIseries",
+					"table": "ABC400FIL_CTFIL_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_CWEXT_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "CBCLB",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CBCPY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBACT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBAD1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBAD2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCTY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSTE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBZIP",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBZC4",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "CBPNM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPA1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPA2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPST",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPZC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBPZ4",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "CBPHA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPHP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPHN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSLM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSBD",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBPMO",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCH",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBEDT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBRDT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBTF3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBWGR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBIAR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCCP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCPD",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCED",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCCC",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCDF",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBACF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBACA",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CBACP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBAPD",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBAED",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBACC",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBADF",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBNLR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNPC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPCM",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPCD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBRLM",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBARF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCSH",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBRIF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBSVC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBSVD",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBGDY",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "CBLCF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLCA",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBLCP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBLLF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL15",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL30",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL45",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL60",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLPO",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPMR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRPS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF7",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSC",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "CBPCP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTZN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSCC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRCS",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CBLMU",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBTF9",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW7",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW8",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW9",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SOURCE_SYSTEM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DW_CHANGE_DATE",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "HASHKEY",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgIseries",
+					"table": "ABC400FIL_CWEXT_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_CWFIL_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "CBCLB",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CBCPY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBACT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBAD1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBAD2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCTY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSTE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBZIP",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBZC4",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "CBPNM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPA1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPA2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPST",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPZC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBPZ4",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "CBPHA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPHP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPHN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSLM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSBD",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBPMO",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCH",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBEDT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBRDT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBTF3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBWGR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBIAR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCCP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCPD",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCED",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCCC",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCDF",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBACF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBACA",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CBACP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBAPD",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBAED",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBACC",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBADF",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBNLR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNPC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPCM",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPCD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBRLM",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBARF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCSH",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBRIF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBSVC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBSVD",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBGDY",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "CBLCF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLCA",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBLCP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBLLF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL15",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL30",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL45",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL60",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLPO",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPMR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRPS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF7",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSC",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "CBPCP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTZN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSCC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRCS",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CBLMU",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBTF9",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW7",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW8",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW9",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SOURCE_SYSTEM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DW_CHANGE_DATE",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "HASHKEY",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgIseries",
+					"table": "ABC400FIL_CWFIL_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_CXFIL_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "CBCLB",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CBCPY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBACT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBAD1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBAD2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCTY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSTE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBZIP",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBZC4",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "CBPNM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPA1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPA2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPST",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPZC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBPZ4",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "CBPHA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPHP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPHN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSLM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSBD",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBPMO",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCH",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBEDT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBRDT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBTF3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBWGR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBIAR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCCP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCPD",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCED",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCCC",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCDF",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBACF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBACA",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CBACP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBAPD",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBAED",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBACC",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBADF",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBNLR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNPC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPCM",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPCD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBRLM",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBARF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCSH",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBRIF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBSVC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBSVD",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBGDY",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "CBLCF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLCA",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBLCP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBLLF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL15",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL30",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL45",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL60",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLPO",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPMR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRPS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF7",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSC",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "CBPCP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTZN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSCC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRCS",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CBLMU",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBTF9",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW7",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW8",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW9",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SOURCE_SYSTEM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DW_CHANGE_DATE",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "HASHKEY",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgIseries",
+					"table": "ABC400FIL_CXFIL_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_DAILY_DEDUCTION_REIMBRSMNT_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "CLUB_NUMBER_I",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CTNDTE",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CTNDTE_DATE",
+						"type": "date"
+					},
+					{
+						"name": "AMOUNT_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AMOUNT_DESCRIPTION",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AMOUNT",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "AMOUNT_DESCRIPTION_MBS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DESCRIPTION_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CLUB_PAYMENT_MODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MID_MONTH_AMOUNT",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "MID_MONTH_STATUS",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgIseries",
+					"table": "DAILY_DEDUCTION_REIMBRSMNT_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_DATECONV_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "THE_DATE",
+						"type": "date"
+					},
+					{
+						"name": "YYYYMMDD",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 0
+					},
+					{
+						"name": "YYMMDD",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "MMDDYY",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "HASHKEY",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgIseries",
+					"table": "ABC400FIL_DATECONV_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_DIGITAL_PAY_DETAIL_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "CBCLB",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CBCPY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBACT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBAD1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBAD2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCTY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSTE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBZIP",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBZC4",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "CBPNM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPA1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPA2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPST",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPZC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBPZ4",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "CBPHA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPHP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPHN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSLM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSBD",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBPMO",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCH",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBEDT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBRDT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBTF3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBWGR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBIAR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCCP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCPD",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCED",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCCC",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCDF",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBACF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBACA",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CBACP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBAPD",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBAED",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBACC",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBADF",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBNLR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNPC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPCM",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPCD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBRLM",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBARF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCSH",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBRIF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBSVC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBSVD",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBGDY",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "CBLCF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLCA",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBLCP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBLLF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL15",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL30",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL45",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL60",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLPO",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPMR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRPS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF7",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSC",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "CBPCP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTZN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSCC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRCS",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CBLMU",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBTF9",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW7",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW8",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW9",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SOURCE_SYSTEM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DW_CHANGE_DATE",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "HASHKEY",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgIseries",
+					"table": "ABC400FIL_DIGITAL_PAY_DETAIL_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_ENTTXNFIL_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "ENTCLIENT",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ENTACCOUNT",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ENTCCTCODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ENTCODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ENTTYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ENTSTRDATE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 0
+					},
+					{
+						"name": "ENTPMTS",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "ENTAMOUNT",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "ENTAMOUNTD",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "ENTAPPLIED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ENTCRTDATE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 0
+					},
+					{
+						"name": "ENTRECUR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ENTFRQ",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ENTSEQ#",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "StgIseries",
+					"table": "ABC400FIL_ENTTXNFIL_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_FCFIL_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "FCCLB",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "FCMBR",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "FCCDE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FCSDT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 0
+					},
+					{
+						"name": "FCSWF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FCTDT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 0
+					},
+					{
+						"name": "FCTWF",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgIseries",
+					"table": "ABC400FIL_FCFIL_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_INVSCDFIL_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "CTCLB",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CTMBR",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CTSEQ",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CTDTE",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CTCEN",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "CTTIM",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CTUSR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTCDE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTTYP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTGRP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTCTA",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CTSTA",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CTCFA",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CTREF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTCBA",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CTCOM",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CTBDT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CTBCH",
+						"type": "decimal",
+						"precision": 3,
+						"scale": 0
+					},
+					{
+						"name": "CTR1F",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTR1S",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CT1DD",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CTDPF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTBPF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTBFWDDATE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 0
+					},
+					{
+						"name": "CTFLAG1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTFLAG2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTFLAG3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTFLAG4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTFLAG5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "IS_DELETED",
+						"type": "bit"
+					},
+					{
+						"name": "SOURCE_SYSTEM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DW_CHANGE_DATE",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "HASHKEY",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgIseries",
+					"table": "ABC400FIL_INVSCDFIL_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_MPBFIL_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "MPBTYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPBDTE",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "MPBCUS",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "MPBCLI",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "MPBTXT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPBCTY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPBINVCNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBINVTOT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBXMTCNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBXMTTOT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBREJCNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBREJTOT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBNETCNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBNETTOT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBABCAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBTCLUB",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "MPBTCUST",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "MPBTCLBAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBEFTPCT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 4
+					},
+					{
+						"name": "MPBEFTAMT",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 2
+					},
+					{
+						"name": "MPBCCDPCTA",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 4
+					},
+					{
+						"name": "MPBCCDAMTA",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 2
+					},
+					{
+						"name": "MPBCCDPCTB",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 4
+					},
+					{
+						"name": "MPBCCDAMTB",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 2
+					},
+					{
+						"name": "MPBCCDPCTD",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 4
+					},
+					{
+						"name": "MPBCCDAMTD",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 2
+					},
+					{
+						"name": "MPBCCDPCTM",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 4
+					},
+					{
+						"name": "MPBCCDAMTM",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 2
+					},
+					{
+						"name": "MPBCCDPCTV",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 4
+					},
+					{
+						"name": "MPBCCDAMTV",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 2
+					},
+					{
+						"name": "MPBXMTDTE",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "MPBREJDTE",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "MPBDWLDTE",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "MPBPRTDTE",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "MPBEFTCNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBEFTTOT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBETTAAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBETT$AMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBEFTXCNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBEFTXAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBEFTECNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBEFTEAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBERJAAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBERJ$AMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBEFTNAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBEFTAAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBEFT$AMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBCCDCNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBCCDTOT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBCCTAAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBCCT$AMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBCCDXCNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBCCDXAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBCCDECNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBCCDEAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBCRJAAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBCRJ$AMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBCCDNAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBCCDAAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBCCDA$AM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBAMXCNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBAMXTOT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBAMXXCNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBAMXXAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBAMXECNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBAMXEAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBAMXEAAM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBAMXE$AM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBAMXNAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBAMXAAAM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBAMXA$AM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBDINCNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBDINTOT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBDINXCNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBDINXAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBDINECNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBDINEAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBDINEAAM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBDINE$AM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBDINNAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBDINAAAM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBDINA$AM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBDISCNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBDISTOT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBDISXCNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBDISXAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBDISECNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBDISEAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBDISEAAM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBDISE$AM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBDISNAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBDISAAAM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBDISA$AM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBMASCNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBMASTOT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBMASXCNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBMASXAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBMASECNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBMASEAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBMASEAAM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBMASE$AM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBMASNAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBMASAAAM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBMASA$AM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBVISCNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBVISTOT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBVISXCNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBVISXAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBVISECNT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPBVISEAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBVISEAAM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBVISE$AM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBVISNAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBVISAAAM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBVISA$AM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "MPBLDERR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPBWF1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPBWF2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPBWF3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPBWF4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPBWF5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPBWF6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPBWF7",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPBWF8",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPBWF9",
+						"type": "nvarchar"
+					},
+					{
+						"name": "HASHKEY",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgIseries",
+					"table": "ABC400FIL_MPBFIL_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_MPPFIL_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "MPPBTYP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPPDTE",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "MPPCUS",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "MPPCLI",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "MPPMBR",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "MPPMBRA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPPCLI#",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPPSEQ",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 0
+					},
+					{
+						"name": "MPPGUID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPPFNM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPPLNM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPPFNMD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPPLNMD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPPCTY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPPTYP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPPBRN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPPBAN",
+						"type": "varbinary"
+					},
+					{
+						"name": "MPPBAT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPPINV",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "MPPREJ",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "MPPNET",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "MPPABCAMT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 2
+					},
+					{
+						"name": "MPPIPCT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 4
+					},
+					{
+						"name": "MPPIAMT",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 2
+					},
+					{
+						"name": "MPPDPCT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 4
+					},
+					{
+						"name": "MPPDAMT",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 2
+					},
+					{
+						"name": "MPPCPCT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 4
+					},
+					{
+						"name": "MPPCAMT",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 2
+					},
+					{
+						"name": "MPPSTAT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPPRETCD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPPCGBCD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MPPORGDTE",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "MPPREPDTE",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "MPPFCLBAMT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 2
+					},
+					{
+						"name": "MPPTCLBAMT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 2
+					},
+					{
+						"name": "MPPTIPCT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 4
+					}
+				],
+				"typeProperties": {
+					"schema": "StgIseries",
+					"table": "ABC400FIL_MPPFIL_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_PF_PROJECTION')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "CDCLB",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CDDTE",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CNT",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DUES",
+						"type": "decimal",
+						"precision": 15,
+						"scale": 2
+					}
+				],
+				"typeProperties": {
+					"schema": "DW",
+					"table": "PF_PROJECTION_ISERIES_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_PJTFIL_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "PJTPRJCDE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PJTCLB",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PJTPRJDTE",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "PJTSRTCDE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PJTCCTCODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PJTOCUR$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTOTOT#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTOCUR#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTOCURC",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTOPCUR$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTOPCUR#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTOPCURC",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTOP130$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTOP130#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTOP130C",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTOP3160$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTOP3160#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTOP3160C",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTOP6190$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTOP6190#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTOP6190C",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTOP91UP$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTOP91UP#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTOP91UPC",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTOBALC",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTOBAL#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTOBAL$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTOMOINV$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTONTDC",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTONTD#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTONTINV$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTONTBAL$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTOINVPD$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTOINVPD#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTOINVPDC",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTICUR$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTITOT#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTICUR#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTICURC",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTIPCUR$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTIPCUR#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTIPCURC",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTIP130$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTIP130#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTIP130C",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTIP3160$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTIP3160#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTIP3160C",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTIP6190$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTIP6190#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTIP6190C",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTIP91UP$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTIP91UP#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTIP91UPC",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTIBALC",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTIBAL#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTIBAL$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTIMOINV$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTINTD#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTINTDC",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTINTINV$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTINTBAL$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTIINVPD$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTIINVPD#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTIINVPDC",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTCUR$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTTOT#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTCUR#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTCURC",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTPCUR$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTPCUR#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTPCURC",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTP130$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTP130#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTP130C",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTP3160$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTP3160#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTP3160C",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTP6190$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTP6190#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTP6190C",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTP91UP$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTP91UP#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTP91UPC",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTBAL#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTBALC",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTBAL$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTMOINV$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTNTD#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTNTDC",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTNTINV$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTNTBAL$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTPIF#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTINVPD$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTINVPD#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTINVPDC",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTCPN#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTCPNMO$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTDFT#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTDFTMO$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTCCD#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTCCDMO$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					},
+					{
+						"name": "PJTPRB#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "PJTPRBMO$",
+						"type": "decimal",
+						"precision": 13,
+						"scale": 2
+					}
+				],
+				"typeProperties": {
+					"schema": "StgIseries",
+					"table": "ABC400FIL_PJTFIL_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_PTFIL_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "CBCLB",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CBCPY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBACT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBAD1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBAD2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCTY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSTE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBZIP",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBZC4",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "CBPNM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPA1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPA2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPST",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPZC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBPZ4",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "CBPHA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPHP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPHN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSLM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSBD",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBPMO",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCH",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBEDT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBRDT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBTF3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBWGR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBIAR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCCP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCPD",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCED",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCCC",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCDF",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBACF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBACA",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CBACP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBAPD",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBAED",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBACC",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBADF",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBNLR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNPC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPCM",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPCD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBRLM",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBARF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCSH",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBRIF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBSVC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBSVD",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBGDY",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "CBLCF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLCA",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBLCP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBLLF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL15",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL30",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL45",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL60",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLPO",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPMR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRPS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF7",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSC",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "CBPCP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTZN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSCC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRCS",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CBLMU",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBTF9",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW7",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW8",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW9",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SOURCE_SYSTEM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DW_CHANGE_DATE",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "HASHKEY",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgIseries",
+					"table": "ABC400FIL_PTFIL_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_RFCFILNEW_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "RFNCLB",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "RFNMBR",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "RFNDTE",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "RFNTYP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "RFNMDE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "RFNFRQ",
+						"type": "nvarchar"
+					},
+					{
+						"name": "RFNSNDCOL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "RFNPMTAMT",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "RFNBALAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "RFNPSTDUE",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "RFNPCSAMT",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 2
+					},
+					{
+						"name": "RFNDFTCDE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "RFNRFCCYC",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgIseries",
+					"table": "ABC400FIL_RFCFILNEW_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_STFIL_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "CBCLB",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CBCPY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBACT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBAD1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBAD2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCTY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSTE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBZIP",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBZC4",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "CBPNM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPA1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPA2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPST",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPZC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBPZ4",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "CBPHA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPHP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPHN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSLM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSBD",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBPMO",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCH",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBEDT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBRDT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBTF3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBWGR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBIAR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCCP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCPD",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCED",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCCC",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCDF",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBACF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBACA",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CBACP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBAPD",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBAED",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBACC",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBADF",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBNLR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNPC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPCM",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPCD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBRLM",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBARF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCSH",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBRIF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBSVC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBSVD",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBGDY",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "CBLCF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLCA",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBLCP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBLLF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL15",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL30",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL45",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL60",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLPO",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPMR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRPS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF7",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSC",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "CBPCP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTZN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSCC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRCS",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CBLMU",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBTF9",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW7",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW8",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW9",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SOURCE_SYSTEM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DW_CHANGE_DATE",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "HASHKEY",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgIseries",
+					"table": "ABC400FIL_STFIL_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_TBNEWEXT_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "TBDTE",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "TBNUM",
+						"type": "decimal",
+						"precision": 3,
+						"scale": 0
+					},
+					{
+						"name": "TBBLDUSR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TBBLDCDE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TBBLDBSC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TBBLDBSD",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 0
+					},
+					{
+						"name": "TBBLDDTE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 0
+					},
+					{
+						"name": "TBBLDTIM",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "TBPUTDTE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 0
+					},
+					{
+						"name": "TBPUTTIM",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "TBCLSDTE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 0
+					},
+					{
+						"name": "TBCLSTIM",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "TBPNDPMT#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBPNDLTE#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBPNDSRV#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBPNDCNV#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBPNDTOT#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBPNDPMT$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "TBPNDLTE$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "TBPNDSRV$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "TBPNDCNV$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "TBPNDTOT$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "TBPSTPMT#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBPSTLTE#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBPSTSRV#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBPSTCNV#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBPSTTOT#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBPSTPMT$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "TBPSTLTE$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "TBPSTSRV$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "TBPSTCNV$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "TBPSTTOT$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "TBATMPMT#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBATMLTE#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBATMSRV#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBATMCNV#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBATMTOT#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBATMPMT$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "TBATMLTE$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "TBATMSRV$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "TBATMCNV$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "TBATMTOT$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "TBDCLPMT#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBDCLLTE#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBDCLSRV#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBDCLCNV#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBDCLTOT#",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "TBDCLPMT$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "TBDCLLTE$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "TBDCLSRV$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "TBDCLCNV$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "TBDCLTOT$",
+						"type": "decimal",
+						"precision": 11,
+						"scale": 2
+					},
+					{
+						"name": "HASHKEY",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgIseries",
+					"table": "ABC400FIL_TBNEWEXT_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_TCFIL_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "CBCLB",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CBCPY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBACT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBAD1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBAD2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCTY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSTE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBZIP",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBZC4",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "CBPNM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPA1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPA2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPST",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPZC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBPZ4",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "CBPHA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPHP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPHN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBFXN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCN6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSLM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSBD",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBPMO",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCH",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBEDT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBRDT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBTF3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBWGR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBIAR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCCP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCPD",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCED",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCCC",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBCDF",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBACF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBACA",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CBACP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBAPD",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBAED",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBACC",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBADF",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBNLR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNLP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBNPC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPCM",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPCD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPCT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRLC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBRLM",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBARF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBCSH",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBRIF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBSVC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBSVD",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CBGDY",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "CBLCF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLCA",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBLCP",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 3
+					},
+					{
+						"name": "CBLLF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL15",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL30",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL45",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBL60",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBLPO",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMC",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 2
+					},
+					{
+						"name": "CBPMR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBPMA",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRPS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF7",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTF2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTSC",
+						"type": "decimal",
+						"precision": 1,
+						"scale": 0
+					},
+					{
+						"name": "CBPCP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTZN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBSCC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBRCS",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "CBLMU",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "CBTF9",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW5",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW6",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW7",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW8",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CBTW9",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SOURCE_SYSTEM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DW_CHANGE_DATE",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "HASHKEY",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgIseries",
+					"table": "ABC400FIL_TCFIL_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_ISERIES_TFRATBL_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "TRFNM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRMI",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRLNM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRACCD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRAD1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRAD2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRCTY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRSTE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRZIP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TREMAIL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRBEMAIL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRDATE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 0
+					},
+					{
+						"name": "TRREASCD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRTRNFEE",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 2
+					},
+					{
+						"name": "TRSKPFLG",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRFCPY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRFRCLB",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TRFRMEM",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 0
+					},
+					{
+						"name": "TRFRCLBEML",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRFRORD",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "TRFRTAX",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 5
+					},
+					{
+						"name": "TRFRNTYP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRTCPY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRTOCLB",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TRTOMEM",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TRTOCLBEML",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRTOORD",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "TRTOTAX",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 5
+					},
+					{
+						"name": "TRTRNTYP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRTRNPGM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRTRNUSR",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRTRNENT",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "TREMLSNT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRAST",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRSTC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TRSTD",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "StgIseries",
+					"table": "ABC400FIL_TFRATBL_INCR"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

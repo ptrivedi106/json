@@ -1,0 +1,5756 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "PlanetFitnessDF"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Employee')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_EMPLOYEE",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_Employee_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase2",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_EMPLOYEE_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SNK_StgRCM_ORGANIZATION_EMPLOYEE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_EMPLOYEE",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "`employee`"
+							},
+							{
+								"name": "Destination",
+								"value": "StgRCM.ORGANIZATION_EMPLOYEE_INCR"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(emp_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(emp_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(emp_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(emp_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(emp_id), 21)\n\t\t\t)) AS emp_id\n\t,LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(org_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 21)\n\t\t\t)) AS org_id\n\t,emp_created\n\t,emp_modified\n\t,emp_description\n\t,emp_name_first\n\t,emp_name_last\n\t,emp_birth_date\n\t,emp_phone_number\n\t,emp_phone_extension\n\t,emp_email\n\t,emp_is_active\n\t,LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(adr_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(adr_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(adr_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(adr_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(adr_id), 21)\n\t\t\t)) AS adr_id\n\t,emp_access_password\n\t,emp_access_level\n        ,emp_middle_name\n\t,emp_photo_path\n   ,emp_has_organization_access\n   ,emp_is_dnc\n   ,emp_phone_country_code\n   ,emp_type\n   ,emp_note\nFROM organization.employee\nWHERE emp_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')\nAND emp_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"parallelCopies": 32,
+							"validateDataConsistency": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "emp_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "emp_created",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "emp_modified",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_description",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_description",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_name_first",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_name_first",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_name_last",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_name_last",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_birth_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "emp_birth_date",
+											"type": "DateTime",
+											"physicalType": "date"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_phone_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_phone_number",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_phone_extension",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_phone_extension",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_email",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_email",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_is_active",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "emp_is_active",
+											"type": "Boolean",
+											"physicalType": "bit"
+										}
+									},
+									{
+										"source": {
+											"name": "adr_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "adr_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_access_password",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_access_password",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_access_level",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "emp_access_level",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_middle_name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_middle_name",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_photo_path",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_photo_path",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_has_organization_access",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "emp_has_organization_access",
+											"type": "Boolean",
+											"physicalType": "bit"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_is_dnc",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "emp_is_dnc",
+											"type": "Boolean",
+											"physicalType": "bit"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_phone_country_code",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_phone_country_code",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_type",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_note",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_note",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_StgRCM_ORGANIZATION_EMPLOYEE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PF_Backup"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-01-13T20:40:57Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Employee_Location')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_EMPLOYEE_LOCATION",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_Employee_Location_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase2",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_EMPLOYEE_LOCATION_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SNK_StgRCM_ORGANIZATION_EMPLOYEE_LOCATION_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_EMPLOYEE_LOCATION",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "`employee_location`"
+							},
+							{
+								"name": "Destination",
+								"value": "StgRCM.ORGANIZATION_EMPLOYEE_LOCATION_INCR"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(emp_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(emp_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(emp_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(emp_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(emp_id), 21)\n\t\t\t)) AS emp_id\n\t,LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(loc_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(loc_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(loc_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(loc_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(loc_id), 21)\n\t\t\t)) AS loc_id\n\t,eml_created\n\t,eml_modified\n     ,LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(org_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 21)\n\t\t\t)) AS org_id\nFROM organization.employee_location\nWHERE eml_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')\nAND eml_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"parallelCopies": 32,
+							"validateDataConsistency": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "emp_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "eml_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "eml_created",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "eml_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "eml_modified",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_StgRCM_ORGANIZATION_EMPLOYEE_LOCATION_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PF_Backup"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-01-13T20:40:57Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Employee_Location_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_EMPLOYEE_LOCATION",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_Employee_Location_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_EMPLOYEE_LOCATION_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_EMPLOYEE_LOCATION",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Destination",
+								"value": "StgRCM.ORGANIZATION_EMPLOYEE_LOCATION_INCR"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(emp_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(emp_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(emp_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(emp_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(emp_id), 21)\n\t\t\t)) AS emp_id\n\t,LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(loc_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(loc_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(loc_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(loc_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(loc_id), 21)\n\t\t\t)) AS loc_id\n\t,eml_created\n\t,eml_modified\n     ,LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(org_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 21)\n\t\t\t)) AS org_id\nFROM organization.employee_location\nWHERE eml_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')\nAND eml_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "emp_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "eml_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "eml_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "eml_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "eml_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ORGANIZATION_EMPLOYEE_LOCATION_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-08T11:25:33Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Employee_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_EMPLOYEE",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_Employee_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_EMPLOYEE_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_EMPLOYEE",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Destination",
+								"value": "StgRCM.ORGANIZATION_EMPLOYEE_INCR"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(emp_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(emp_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(emp_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(emp_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(emp_id), 21)\n\t\t\t)) AS emp_id\n\t,LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(org_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 21)\n\t\t\t)) AS org_id\n\t,emp_created\n\t,emp_modified\n\t,emp_description\n\t,emp_name_first\n\t,emp_name_last\n\t,emp_birth_date\n\t,emp_phone_number\n\t,emp_phone_extension\n\t,emp_email\n\t,emp_is_active\n\t,LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(adr_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(adr_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(adr_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(adr_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(adr_id), 21)\n\t\t\t)) AS adr_id\n\t,emp_access_password\n\t,emp_access_level\n        ,emp_middle_name\n\t,emp_photo_path\n   ,emp_has_organization_access\n   ,emp_is_dnc\n   ,emp_phone_country_code\n   ,emp_type\n   ,emp_note\nFROM organization.employee\nWHERE emp_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')\nAND emp_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "emp_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "emp_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "emp_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_description",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_description",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_name_first",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_name_first",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_name_last",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_name_last",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_birth_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "emp_birth_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_phone_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_phone_number",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_phone_extension",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_phone_extension",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_email",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_email",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_is_active",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "emp_is_active",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "adr_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "adr_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_access_password",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_access_password",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_access_level",
+											"type": "Int32"
+										},
+										"sink": {
+											"name": "emp_access_level",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_middle_name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_middle_name",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_photo_path",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_photo_path",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_has_organization_access",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "emp_has_organization_access",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_is_dnc",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "emp_is_dnc",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_phone_country_code",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_phone_country_code",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "emp_note",
+											"type": "String"
+										},
+										"sink": {
+											"name": "emp_note",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ORGANIZATION_EMPLOYEE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-08T11:25:30Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Location')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_Location",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_Location_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase2",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_LOCATION_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SNK_StgRCM_ORGANIZATION_LOCATION_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_Location",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "`location`"
+							},
+							{
+								"name": "Destination",
+								"value": "StgRCM.ORGANIZATION_LOCATION_INCR"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT LOWER(CONCAT(SUBSTR(HEX(org_id),1,8),'-',SUBSTR(HEX(org_id),9,4),'-',SUBSTR(HEX(org_id),13,4),'-',SUBSTR(HEX(org_id),17,4),'-',SUBSTR(HEX(org_id),21))) AS org_id,\n       LOWER(CONCAT(SUBSTR(HEX(loc_id),1,8),'-',SUBSTR(HEX(loc_id),9,4),'-',SUBSTR(HEX(loc_id),13,4),'-',SUBSTR(HEX(loc_id),17,4),'-',SUBSTR(HEX(loc_id),21))) AS loc_id,\n       loc_created,\n       loc_modified,\n       loc_number,\n       loc_name,\n       loc_email,\n       loc_phone_number,\n       loc_phone_extension,\n       tzl_id,\n       loc_is_email_identity_verified,\nSTR_TO_DATE(CASE WHEN loc_verification_request_date = '0000-00-00 00:00:00' THEN '1/1/1900' ELSE loc_verification_request_date END, '%Y-%m-%d %H:%i') AS loc_verification_request_date,\n       LOWER(CONCAT(SUBSTR(HEX(adr_id),1,8),'-',SUBSTR(HEX(adr_id),9,4),'-',SUBSTR(HEX(adr_id),13,4),'-',SUBSTR(HEX(adr_id),17,4),'-',SUBSTR(HEX(adr_id),21))) AS adr_id,\n\t   LOWER(CONCAT(SUBSTR(HEX(adr_mailing_id),1,8),'-',SUBSTR(HEX(adr_mailing_id),9,4),'-',SUBSTR(HEX(adr_mailing_id),13,4),'-',SUBSTR(HEX(adr_mailing_id),17,4),'-',SUBSTR(HEX(adr_mailing_id),21))) AS adr_mailing_id,\n       loc_is_email_identity_verification_failed,\n       loc_card_authorization_doc_id,\n       loc_language,\n       loc_region,\n       loc_variant,\n\t   loc_phone_country_code,\n\t   LOWER(CONCAT(SUBSTR(HEX(br_id),1,8),'-',SUBSTR(HEX(br_id),9,4),'-',SUBSTR(HEX(br_id),13,4),'-',SUBSTR(HEX(br_id),17,4),'-',SUBSTR(HEX(br_id),21))) AS br_id\nFROM organization.location \nWHERE loc_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND loc_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"parallelCopies": 32,
+							"validateDataConsistency": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "loc_created",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "loc_modified",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_number",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_name",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_email",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_email",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_phone_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_phone_number",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_phone_extension",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_phone_extension",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "tzl_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "tzl_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_is_email_identity_verified",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "loc_is_email_identity_verified",
+											"type": "Boolean",
+											"physicalType": "bit"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_verification_request_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "loc_verification_request_date",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "adr_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "adr_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "adr_mailing_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "adr_mailing_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_is_email_identity_verification_failed",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "loc_is_email_identity_verification_failed",
+											"type": "Boolean",
+											"physicalType": "bit"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_card_authorization_doc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_card_authorization_doc_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_language",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_language",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_region",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_region",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_variant",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_variant",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_phone_country_code",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_phone_country_code",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "br_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "br_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_StgRCM_ORGANIZATION_LOCATION_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PF_Backup"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-01-13T20:40:57Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Location_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_Location",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_Location_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_LOCATION_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_Location",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Destination",
+								"value": "StgRCM.ORGANIZATION_LOCATION_INCR"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT LOWER(CONCAT(SUBSTR(HEX(org_id),1,8),'-',SUBSTR(HEX(org_id),9,4),'-',SUBSTR(HEX(org_id),13,4),'-',SUBSTR(HEX(org_id),17,4),'-',SUBSTR(HEX(org_id),21))) AS org_id,\n       LOWER(CONCAT(SUBSTR(HEX(loc_id),1,8),'-',SUBSTR(HEX(loc_id),9,4),'-',SUBSTR(HEX(loc_id),13,4),'-',SUBSTR(HEX(loc_id),17,4),'-',SUBSTR(HEX(loc_id),21))) AS loc_id,\n       loc_created,\n       loc_modified,\n       loc_number,\n       loc_name,\n       loc_email,\n       loc_phone_number,\n       loc_phone_extension,\n       tzl_id,\n       loc_is_email_identity_verified,\nSTR_TO_DATE(CASE WHEN loc_verification_request_date = '0000-00-00 00:00:00' THEN '1/1/1900' ELSE loc_verification_request_date END, '%Y-%m-%d %H:%i') AS loc_verification_request_date,\n       LOWER(CONCAT(SUBSTR(HEX(adr_id),1,8),'-',SUBSTR(HEX(adr_id),9,4),'-',SUBSTR(HEX(adr_id),13,4),'-',SUBSTR(HEX(adr_id),17,4),'-',SUBSTR(HEX(adr_id),21))) AS adr_id,\n\t   LOWER(CONCAT(SUBSTR(HEX(adr_mailing_id),1,8),'-',SUBSTR(HEX(adr_mailing_id),9,4),'-',SUBSTR(HEX(adr_mailing_id),13,4),'-',SUBSTR(HEX(adr_mailing_id),17,4),'-',SUBSTR(HEX(adr_mailing_id),21))) AS adr_mailing_id,\n       loc_is_email_identity_verification_failed,\n       loc_card_authorization_doc_id,\n       loc_language,\n       loc_region,\n       loc_variant,\n\t   loc_phone_country_code,\n\t   LOWER(CONCAT(SUBSTR(HEX(br_id),1,8),'-',SUBSTR(HEX(br_id),9,4),'-',SUBSTR(HEX(br_id),13,4),'-',SUBSTR(HEX(br_id),17,4),'-',SUBSTR(HEX(br_id),21))) AS br_id\nFROM organization.location \nWHERE loc_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND loc_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "loc_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "loc_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_number",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_name",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_email",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_email",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_phone_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_phone_number",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_phone_extension",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_phone_extension",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "tzl_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "tzl_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_is_email_identity_verified",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "loc_is_email_identity_verified",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_verification_request_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "loc_verification_request_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "adr_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "adr_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "adr_mailing_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "adr_mailing_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_is_email_identity_verification_failed",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "loc_is_email_identity_verification_failed",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_card_authorization_doc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_card_authorization_doc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_language",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_language",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_region",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_region",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_variant",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_variant",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_phone_country_code",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_phone_country_code",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "br_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "br_id",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ORGANIZATION_LOCATION_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-08T11:25:31Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Member')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_MEMBER",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_Member_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase2",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_MEMBER_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SNK_StgRCM_ORGANIZATION_MEMBER_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_MEMBER",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "`member`"
+							},
+							{
+								"name": "Destination",
+								"value": "StgRCM.ORGANIZATION_MEMBER_INCR"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(m_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(m_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(m_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(m_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(m_id), 21)\n\t\t\t)) AS m_id\n\t,LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(loc_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(loc_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(loc_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(loc_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(loc_id), 21)\n\t\t\t)) AS loc_id\n\t,m_created\n\t,m_modified\n\t,LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(org_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 21)\n\t\t\t)) AS org_id\n\t,m_name_first\n\t,m_name_last\n\t,m_birth_date\n\t,m_email\n\t,m_access_code\n\t,LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(adr_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(adr_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(adr_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(adr_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(adr_id), 21)\n\t\t\t)) AS adr_id\n\t,m_gender_identity\n\t,m_employer\n\t,m_occupation\n,m_middle_name\n,m_photo_path\n,m_is_invalid_address\n,LOWER(CONCAT(\n   SUBSTR(HEX(m_primary_id), 1, 8 ), '-',\n      SUBSTR(HEX(m_primary_id), 9, 4), '-',\n         SUBSTR(HEX(m_primary_id), 13, 4), '-',\n            SUBSTR(HEX(m_primary_id), 17, 4), '-',\n               SUBSTR(HEX(m_primary_id), 21)\n                )) AS m_primary_id\n ,m_number\n ,m_member_since\n ,m_use_primary_member_address\n ,LOWER(CONCAT(\n   SUBSTR(HEX(mst_id), 1, 8 ), '-',\n      SUBSTR(HEX(mst_id), 9, 4), '-',\n         SUBSTR(HEX(mst_id), 13, 4), '-',\n            SUBSTR(HEX(mst_id), 17, 4), '-',\n               SUBSTR(HEX(mst_id), 21)\n                )) AS mst_id\n,m_is_active\n,m_status\n,LOWER(CONCAT(\n   SUBSTR(HEX(m_br_id), 1, 8 ), '-',\n      SUBSTR(HEX(m_br_id), 9, 4), '-',\n         SUBSTR(HEX(m_br_id), 13, 4), '-',\n            SUBSTR(HEX(m_br_id), 17, 4), '-',\n               SUBSTR(HEX(m_br_id), 21)\n                )) AS m_br_id\n,LOWER(CONCAT(\n   SUBSTR(HEX(m_org_id), 1, 8 ), '-',\n      SUBSTR(HEX(m_org_id), 9, 4), '-',\n         SUBSTR(HEX(m_org_id), 13, 4), '-',\n            SUBSTR(HEX(m_org_id), 17, 4), '-',\n               SUBSTR(HEX(m_org_id), 21)\n                )) AS m_org_id\n,m_member_since_date\n,m_rejoin_group_id\t\t\t\t\nFROM organization.member \nWHERE m_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')\nAND m_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"parallelCopies": 32,
+							"validateDataConsistency": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "m_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "m_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "m_created",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "m_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "m_modified",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "m_name_first",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_name_first",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "m_name_last",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_name_last",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "m_birth_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "m_birth_date",
+											"type": "DateTime",
+											"physicalType": "date"
+										}
+									},
+									{
+										"source": {
+											"name": "m_email",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_email",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "m_access_code",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_access_code",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "adr_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "adr_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "m_gender_identity",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_gender_identity",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "m_employer",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_employer",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "m_occupation",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_occupation",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "m_middle_name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_middle_name",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "m_photo_path",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_photo_path",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "m_is_invalid_address",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "m_is_invalid_address",
+											"type": "Boolean",
+											"physicalType": "bit"
+										}
+									},
+									{
+										"source": {
+											"name": "m_primary_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_primary_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "m_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_number",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "m_member_since",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "m_member_since",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "m_use_primary_member_address",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "m_use_primary_member_address",
+											"type": "Boolean",
+											"physicalType": "bit"
+										}
+									},
+									{
+										"source": {
+											"name": "mst_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mst_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "m_is_active",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "m_is_active",
+											"type": "Boolean",
+											"physicalType": "bit"
+										}
+									},
+									{
+										"source": {
+											"name": "m_status",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_status",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "m_br_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_br_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "m_org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_org_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "m_member_since_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "m_member_since_date",
+											"type": "DateTime",
+											"physicalType": "date"
+										}
+									},
+									{
+										"source": {
+											"name": "m_rejoin_group_id",
+											"type": "Byte[]"
+										},
+										"sink": {
+											"name": "m_rejoin_group_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_StgRCM_ORGANIZATION_MEMBER_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PF_Backup"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-01-13T20:40:57Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Member_Phone')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_MEMBER_PHONE",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_member_phone_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase2",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_MEMBER_PHONE_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SNK_StgRCM_ORGANIZATION_MEMBER_PHONE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_MEMBER_PHONE",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Destination",
+								"value": "StgRCM.ORGANIZATION_MEMBER_PHONE_INCR"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT\t\n    LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(mph_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(mph_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(mph_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(mph_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(mph_id), 21)\n\t\t\t)) AS mph_id,\n\t\t\tmph_created,\n\t                mph_modified,\n\t\t\tmph_phone_type,\n\t\t\tmph_phone_number,\n\t\t\tmph_phone_extension,\t\t\t\n\t\t\t\n LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(m_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(m_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(m_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(m_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(m_id), 21)\n\t\t\t)) AS m_id,\nmph_phone_country_code,\n\tmph_phone_comment,\n\tmph_is_primary,\n\tmph_phone_name_first,\n\tmph_phone_name_middle,\n\tmph_phone_name_last,\n\tmph_phone_relationship\n\nFROM organization.member_phone\nWHERE mph_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')\nAND mph_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"parallelCopies": 32,
+							"validateDataConsistency": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "mph_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "mph_created",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "mph_modified",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_phone_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_phone_type",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_phone_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_phone_number",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_phone_extension",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_phone_extension",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "m_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_phone_country_code",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_phone_country_code",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_phone_comment",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_phone_comment",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_is_primary",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "mph_is_primary",
+											"type": "Boolean",
+											"physicalType": "bit"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_phone_name_first",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_phone_name_first",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_phone_name_middle",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_phone_name_middle",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_phone_name_last",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_phone_name_last",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_phone_relationship",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_phone_relationship",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_StgRCM_ORGANIZATION_MEMBER_PHONE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PF_Backup"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-01-13T20:40:57Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Member_Phone_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_MEMBER_PHONE",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_member_phone_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_MEMBER_PHONE_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_MEMBER_PHONE",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Destination",
+								"value": "StgRCM.ORGANIZATION_MEMBER_PHONE_INCR"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT\t\n    LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(mph_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(mph_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(mph_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(mph_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(mph_id), 21)\n\t\t\t)) AS mph_id,\n\t\t\tmph_created,\n\t                mph_modified,\n\t\t\tmph_phone_type,\n\t\t\tmph_phone_number,\n\t\t\tmph_phone_extension,\t\t\t\n\t\t\t\n LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(m_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(m_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(m_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(m_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(m_id), 21)\n\t\t\t)) AS m_id,\nmph_phone_country_code,\n\tmph_phone_comment,\n\tmph_is_primary,\n\tmph_phone_name_first,\n\tmph_phone_name_middle,\n\tmph_phone_name_last,\n\tmph_phone_relationship\n\nFROM organization.member_phone\nWHERE mph_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')\nAND mph_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "mph_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "mph_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "mph_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_phone_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_phone_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_phone_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_phone_number",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_phone_extension",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_phone_extension",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "m_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_phone_country_code",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_phone_country_code",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_phone_comment",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_phone_comment",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_is_primary",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "mph_is_primary",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_phone_name_first",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_phone_name_first",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_phone_name_middle",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_phone_name_middle",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_phone_name_last",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_phone_name_last",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mph_phone_relationship",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mph_phone_relationship",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ORGANIZATION_MEMBER_PHONE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-08T11:25:32Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Member_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_MEMBER",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_Member_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_MEMBER_INCR;\nselect 0;\n",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_MEMBER",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Destination",
+								"value": "StgRCM.ORGANIZATION_MEMBER_INCR"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(m_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(m_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(m_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(m_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(m_id), 21)\n\t\t\t)) AS m_id\n\t,LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(loc_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(loc_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(loc_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(loc_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(loc_id), 21)\n\t\t\t)) AS loc_id\n\t,m_created\n\t,m_modified\n\t,LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(org_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 21)\n\t\t\t)) AS org_id\n\t,m_name_first\n\t,m_name_last\n\t,m_birth_date\n\t,m_email\n\t,m_access_code\n\t,LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(adr_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(adr_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(adr_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(adr_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(adr_id), 21)\n\t\t\t)) AS adr_id\n\t,m_gender_identity\n\t,m_employer\n\t,m_occupation\n,m_middle_name\n,m_photo_path\n,m_is_invalid_address\n,LOWER(CONCAT(\n   SUBSTR(HEX(m_primary_id), 1, 8 ), '-',\n      SUBSTR(HEX(m_primary_id), 9, 4), '-',\n         SUBSTR(HEX(m_primary_id), 13, 4), '-',\n            SUBSTR(HEX(m_primary_id), 17, 4), '-',\n               SUBSTR(HEX(m_primary_id), 21)\n                )) AS m_primary_id\n ,m_number\n ,m_member_since\n ,m_use_primary_member_address\n ,LOWER(CONCAT(\n   SUBSTR(HEX(mst_id), 1, 8 ), '-',\n      SUBSTR(HEX(mst_id), 9, 4), '-',\n         SUBSTR(HEX(mst_id), 13, 4), '-',\n            SUBSTR(HEX(mst_id), 17, 4), '-',\n               SUBSTR(HEX(mst_id), 21)\n                )) AS mst_id\n,m_is_active\n,m_status\n,LOWER(CONCAT(\n   SUBSTR(HEX(m_br_id), 1, 8 ), '-',\n      SUBSTR(HEX(m_br_id), 9, 4), '-',\n         SUBSTR(HEX(m_br_id), 13, 4), '-',\n            SUBSTR(HEX(m_br_id), 17, 4), '-',\n               SUBSTR(HEX(m_br_id), 21)\n                )) AS m_br_id\n,LOWER(CONCAT(\n   SUBSTR(HEX(m_org_id), 1, 8 ), '-',\n      SUBSTR(HEX(m_org_id), 9, 4), '-',\n         SUBSTR(HEX(m_org_id), 13, 4), '-',\n            SUBSTR(HEX(m_org_id), 17, 4), '-',\n               SUBSTR(HEX(m_org_id), 21)\n                )) AS m_org_id\n,m_member_since_date\n,m_rejoin_group_id\t\t\t\t\nFROM organization.member \nWHERE m_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')\nAND m_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "m_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "m_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "m_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "m_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "m_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "m_name_first",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_name_first",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "m_name_last",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_name_last",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "m_birth_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "m_birth_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "m_email",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_email",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "m_access_code",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_access_code",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "adr_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "adr_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "m_gender_identity",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_gender_identity",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "m_employer",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_employer",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "m_occupation",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_occupation",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "m_middle_name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_middle_name",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "m_photo_path",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_photo_path",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "m_is_invalid_address",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "m_is_invalid_address",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "m_primary_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_primary_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "m_number",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_number",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "m_member_since",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "m_member_since",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "m_use_primary_member_address",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "m_use_primary_member_address",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "mst_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mst_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "m_is_active",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "m_is_active",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "m_status",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_status",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "m_br_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_br_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "m_org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "m_org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "m_member_since_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "m_member_since_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "m_rejoin_group_id",
+											"type": "Byte[]"
+										},
+										"sink": {
+											"name": "m_rejoin_group_id",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ORGANIZATION_MEMBER_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-08T11:25:31Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Membership_Type')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_MEMBERSHIP_TYPE",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_Membership_Type_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase2",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_MEMBERSHIP_TYPE_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SNK_StgRCM_ORGANIZATION_MEMBERSHIP_TYPE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_MEMBERSHIP_TYPE",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Destination",
+								"value": "StgRCM.ORGANIZATION_MEMBERSHIP_TYPE_INCR"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT\t\n    LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(org_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 21)\n\t\t\t)) AS org_id,\n LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(mst_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(mst_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(mst_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(mst_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(mst_id), 21)\n\t\t\t)) AS mst_id,\nmst_name,\nmst_description,\nmst_is_active,\nmst_created,\nmst_modified\n\nFROM organization.membership_type\nWHERE mst_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')\nAND mst_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"parallelCopies": 32,
+							"validateDataConsistency": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "mst_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mst_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "mst_name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mst_name",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "mst_description",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mst_description",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "mst_is_active",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "mst_is_active",
+											"type": "Boolean",
+											"physicalType": "bit"
+										}
+									},
+									{
+										"source": {
+											"name": "mst_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "mst_created",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "mst_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "mst_modified",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_StgRCM_ORGANIZATION_MEMBERSHIP_TYPE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PF_Backup"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-01-13T20:40:57Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Membership_Type_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_MEMBERSHIP_TYPE",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_Membership_Type_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_MEMBERSHIP_TYPE_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_MEMBERSHIP_TYPE",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Destination",
+								"value": "StgRCM.ORGANIZATION_MEMBERSHIP_TYPE_INCR"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT\t\n    LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(org_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(org_id), 21)\n\t\t\t)) AS org_id,\n LOWER(CONCAT (\n\t\t\tSUBSTR(HEX(mst_id), 1, 8)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(mst_id), 9, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(mst_id), 13, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(mst_id), 17, 4)\n\t\t\t,'-'\n\t\t\t,SUBSTR(HEX(mst_id), 21)\n\t\t\t)) AS mst_id,\nmst_name,\nmst_description,\nmst_is_active,\nmst_created,\nmst_modified\n\nFROM organization.membership_type\nWHERE mst_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')\nAND mst_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i ')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mst_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mst_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mst_name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mst_name",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mst_description",
+											"type": "String"
+										},
+										"sink": {
+											"name": "mst_description",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "mst_is_active",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "mst_is_active",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "mst_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "mst_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "mst_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "mst_modified",
+											"type": "DateTime"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ORGANIZATION_MEMBERSHIP_TYPE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-08T11:25:24Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Note')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_Note",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_Note_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase2",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_NOTE_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SNK_StgRCM_ORGANIZATION_NOTE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_Note",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "`note`"
+							},
+							{
+								"name": "Destination",
+								"value": "StgRCM.ORGANIZATION_NOTE_INCR"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT LOWER(CONCAT(SUBSTR(HEX(org_id),1,8),'-',SUBSTR(HEX(org_id),9,4),'-',SUBSTR(HEX(org_id),13,4),'-',SUBSTR(HEX(org_id),17,4),'-',SUBSTR(HEX(org_id),21))) AS org_id,\n       LOWER(CONCAT(SUBSTR(HEX(nt_id),1,8),'-',SUBSTR(HEX(nt_id),9,4),'-',SUBSTR(HEX(nt_id),13,4),'-',SUBSTR(HEX(nt_id),17,4),'-',SUBSTR(HEX(nt_id),21))) AS nt_id,\n       nt_created,\n       nt_modified,\n       LOWER(CONCAT(SUBSTR(HEX(nac_id),1,8),'-',SUBSTR(HEX(nac_id),9,4),'-',SUBSTR(HEX(nac_id),13,4),'-',SUBSTR(HEX(nac_id),17,4),'-',SUBSTR(HEX(nac_id),21))) AS nac_id,\n       nt_text,\n\t   nt_author_first_name,\n       nt_author_last_name,\n       nt_author_user_name,\n       nt_author_alias,\n\t   nt_date,\n       LOWER(CONCAT(SUBSTR(HEX(loc_id),1,8),'-',SUBSTR(HEX(loc_id),9,4),'-',SUBSTR(HEX(loc_id),13,4),'-',SUBSTR(HEX(loc_id),17,4),'-',SUBSTR(HEX(loc_id),21))) AS loc_id,\n       nt_message\n\t   FROM organization.note \nWHERE nt_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND nt_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false,
+								"tableOption": "autoCreate",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"parallelCopies": 32,
+							"validateDataConsistency": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nt_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "nt_created",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "nt_modified",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nac_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_text",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nt_text",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_author_first_name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nt_author_first_name",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_author_last_name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nt_author_last_name",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_author_user_name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nt_author_user_name",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_author_alias",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nt_author_alias",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "nt_date",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_message",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nt_message",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_StgRCM_ORGANIZATION_NOTE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PF_Backup"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-01-13T20:40:57Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Note_Action_Code')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_Note_Action_Code",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_Note_Action_Code_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase2",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_NOTE_ACTION_CODE_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SNK_StgRCM_ORGANIZATION_NOTE_ACTION_CODE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_Note_Action_Code",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "`note_action_code`"
+							},
+							{
+								"name": "Destination",
+								"value": "StgRCM.ORGANIZATION_NOTE_ACTION_CODE_INCR"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT LOWER(CONCAT(SUBSTR(HEX(nac_id),1,8),'-',SUBSTR(HEX(nac_id),9,4),'-',SUBSTR(HEX(nac_id),13,4),'-',\nSUBSTR(HEX(nac_id),17,4),'-',SUBSTR(HEX(nac_id),21))) AS nac_id,\nnac_created,\nnac_modified,\nnac_type,\nnac_code,\nnac_code_type,\nnac_description,\nnac_is_free_format_text_allowed,\nnac_is_active\nFROM organization.note_action_code\nWHERE nac_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND nac_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false,
+								"tableOption": "autoCreate",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"parallelCopies": 32,
+							"validateDataConsistency": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "nac_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nac_id",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "nac_created",
+											"type": "DateTime",
+											"physicalType": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "nac_modified",
+											"type": "DateTime",
+											"physicalType": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nac_type",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_code",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nac_code",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_code_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nac_code_type",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_description",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nac_description",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_is_free_format_text_allowed",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "nac_is_free_format_text_allowed",
+											"type": "Boolean",
+											"physicalType": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_is_active",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "nac_is_active",
+											"type": "Boolean",
+											"physicalType": "Boolean"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_StgRCM_ORGANIZATION_NOTE_ACTION_CODE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PF_Backup"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-01-13T20:40:57Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Note_Action_Code_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_Note_Action_Code",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_Note_Action_Code_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_NOTE_ACTION_CODE_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_Note_Action_Code",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Destination",
+								"value": "StgRCM.ORGANIZATION_NOTE_ACTION_CODE_INCR"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT LOWER(CONCAT(SUBSTR(HEX(nac_id),1,8),'-',SUBSTR(HEX(nac_id),9,4),'-',SUBSTR(HEX(nac_id),13,4),'-',\nSUBSTR(HEX(nac_id),17,4),'-',SUBSTR(HEX(nac_id),21))) AS nac_id,\nnac_created,\nnac_modified,\nnac_type,\nnac_code,\nnac_code_type,\nnac_description,\nnac_is_free_format_text_allowed,\nnac_is_active\nFROM organization.note_action_code\nWHERE nac_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND nac_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "nac_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nac_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "nac_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "nac_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nac_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_code",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nac_code",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_code_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nac_code_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_description",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nac_description",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_is_free_format_text_allowed",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "nac_is_free_format_text_allowed",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_is_active",
+											"type": "Boolean"
+										},
+										"sink": {
+											"name": "nac_is_active",
+											"type": "Boolean"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ORGANIZATION_NOTE_ACTION_CODE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-08T11:25:20Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Note_Reference')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_NOTE_REFERENCE",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_Note_Reference_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase2",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_NOTE_REFERENCE_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SNK_STGRCM_ORGANIZATION_NOTE_REFERENCE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_NOTE_REFERENCE",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT \nLOWER(CONCAT (SUBSTR(HEX(nr_id), 1, 8),'-',SUBSTR(HEX(nr_id), 9, 4),'-',SUBSTR(HEX(nr_id), 13, 4),'-',SUBSTR(HEX(nr_id), 17, 4),'-',SUBSTR(HEX(nr_id), 21))) AS nr_id\n,nr_created\n,nr_modified\n,LOWER(CONCAT (SUBSTR(HEX(nr_ref_id), 1, 8),'-',SUBSTR(HEX(nr_ref_id), 9, 4),'-',SUBSTR(HEX(nr_ref_id), 13, 4),'-',SUBSTR(HEX(nr_ref_id), 17, 4),'-',SUBSTR(HEX(nr_ref_id), 21))) AS nr_ref_id\n,LOWER(CONCAT (SUBSTR(HEX(nt_id), 1, 8),'-',SUBSTR(HEX(nt_id), 9, 4),'-',SUBSTR(HEX(nt_id), 13, 4),'-',SUBSTR(HEX(nt_id), 17, 4),'-',SUBSTR(HEX(nt_id), 21))) AS nt_id\n,nr_type\n,nr_sub_type\nFROM organization.note_reference\nWHERE nr_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND nr_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"tableOption": "autoCreate",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"parallelCopies": 32,
+							"validateDataConsistency": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "nr_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nr_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "nr_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "nr_created",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "nr_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "nr_modified",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "nr_ref_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nr_ref_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nt_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "nr_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nr_type",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "nr_sub_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nr_sub_type",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_STGRCM_ORGANIZATION_NOTE_REFERENCE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PF_Backup"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-01-13T20:40:57Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Note_Reference_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_NOTE_REFERENCE",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_Note_Reference_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_NOTE_REFERENCE_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_NOTE_REFERENCE",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Destination",
+								"value": "StgRCM.ORGANIZATION_NOTE_REFERENCE_INCR"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT \nLOWER(CONCAT (SUBSTR(HEX(nr_id), 1, 8),'-',SUBSTR(HEX(nr_id), 9, 4),'-',SUBSTR(HEX(nr_id), 13, 4),'-',SUBSTR(HEX(nr_id), 17, 4),'-',SUBSTR(HEX(nr_id), 21))) AS nr_id\n,nr_created\n,nr_modified\n,LOWER(CONCAT (SUBSTR(HEX(nr_ref_id), 1, 8),'-',SUBSTR(HEX(nr_ref_id), 9, 4),'-',SUBSTR(HEX(nr_ref_id), 13, 4),'-',SUBSTR(HEX(nr_ref_id), 17, 4),'-',SUBSTR(HEX(nr_ref_id), 21))) AS nr_ref_id\n,LOWER(CONCAT (SUBSTR(HEX(nt_id), 1, 8),'-',SUBSTR(HEX(nt_id), 9, 4),'-',SUBSTR(HEX(nt_id), 13, 4),'-',SUBSTR(HEX(nt_id), 17, 4),'-',SUBSTR(HEX(nt_id), 21))) AS nt_id\n,nr_type\n,nr_sub_type\nFROM organization.note_reference\nWHERE nr_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND nr_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "nr_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nr_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nr_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "nr_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "nr_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "nr_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "nr_ref_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nr_ref_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nt_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nr_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nr_type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nr_sub_type",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nr_sub_type",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ORGANIZATION_NOTE_REFERENCE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-08T11:25:32Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Note_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_Note",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_Note_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_NOTE_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_Note",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Destination",
+								"value": "StgRCM.ORGANIZATION_NOTE_INCR"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT LOWER(CONCAT(SUBSTR(HEX(org_id),1,8),'-',SUBSTR(HEX(org_id),9,4),'-',SUBSTR(HEX(org_id),13,4),'-',SUBSTR(HEX(org_id),17,4),'-',SUBSTR(HEX(org_id),21))) AS org_id,\n       LOWER(CONCAT(SUBSTR(HEX(nt_id),1,8),'-',SUBSTR(HEX(nt_id),9,4),'-',SUBSTR(HEX(nt_id),13,4),'-',SUBSTR(HEX(nt_id),17,4),'-',SUBSTR(HEX(nt_id),21))) AS nt_id,\n       nt_created,\n       nt_modified,\n       LOWER(CONCAT(SUBSTR(HEX(nac_id),1,8),'-',SUBSTR(HEX(nac_id),9,4),'-',SUBSTR(HEX(nac_id),13,4),'-',SUBSTR(HEX(nac_id),17,4),'-',SUBSTR(HEX(nac_id),21))) AS nac_id,\n       nt_text,\n\t   nt_author_first_name,\n       nt_author_last_name,\n       nt_author_user_name,\n       nt_author_alias,\n\t   nt_date,\n       LOWER(CONCAT(SUBSTR(HEX(loc_id),1,8),'-',SUBSTR(HEX(loc_id),9,4),'-',SUBSTR(HEX(loc_id),13,4),'-',SUBSTR(HEX(loc_id),17,4),'-',SUBSTR(HEX(loc_id),21))) AS loc_id,\n       nt_message\n\t   FROM organization.note \nWHERE nt_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND nt_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "org_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "org_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nt_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "nt_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "nt_modified",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nac_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_text",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nt_text",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_author_first_name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nt_author_first_name",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_author_last_name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nt_author_last_name",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_author_user_name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nt_author_user_name",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_author_alias",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nt_author_alias",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_date",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "nt_date",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "loc_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "loc_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nt_message",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nt_message",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ORGANIZATION_NOTE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-08T11:25:33Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Note_note_Action_code')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_NOTE_NOTE_ACTION_CODE",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_Note_Note_Action_Code_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase2",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_NOTE_NOTE_ACTION_CODE_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "SNK_STGRCM_ORGANIZATION_NOTE_NOTE_ACTION_CODE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_NOTE_NOTE_ACTION_CODE",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT \nLOWER(CONCAT (SUBSTR(HEX(nt_id), 1, 8),'-',SUBSTR(HEX(nt_id), 9, 4),'-',SUBSTR(HEX(nt_id), 13, 4),'-',SUBSTR(HEX(nt_id), 17, 4),'-',SUBSTR(HEX(nt_id), 21))) AS nt_id \n,LOWER(CONCAT (SUBSTR(HEX(nac_id), 1, 8),'-',SUBSTR(HEX(nac_id), 9, 4),'-',SUBSTR(HEX(nac_id), 13, 4),'-',SUBSTR(HEX(nac_id), 17, 4),'-',SUBSTR(HEX(nac_id), 21))) AS nac_id \n,nnac_created\n,nnac_modified\nFROM  organization.note_note_action_code\nWHERE nnac_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND nnac_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"tableOption": "autoCreate",
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"parallelCopies": 32,
+							"validateDataConsistency": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "nt_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nt_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nac_id",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "nnac_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "nnac_created",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									},
+									{
+										"source": {
+											"name": "nnac_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "nnac_modified",
+											"type": "DateTime",
+											"physicalType": "datetime2"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_STGRCM_ORGANIZATION_NOTE_NOTE_ACTION_CODE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "PF_Backup"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-01-13T20:40:57Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RCM_ORGANIZATION_Note_note_Action_code_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Merge to Staging",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "RCM_ORGANIZATION_NOTE_NOTE_ACTION_CODE",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[StgRCM].[Organization_Note_Note_Action_Code_Merge]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Truncate Incr table",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlDWSource",
+								"sqlReaderQuery": "truncate table StgRCM.ORGANIZATION_NOTE_NOTE_ACTION_CODE_INCR;\nselect 0;",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSynapseAnalyticsDB",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "RCM_ORGANIZATION_NOTE_NOTE_ACTION_CODE",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Truncate Incr table",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Destination",
+								"value": "StgRCM.ORGANIZATION_NOTE_NOTE_ACTION_CODE_INCR"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "MySqlSource",
+								"query": {
+									"value": "SELECT \nLOWER(CONCAT (SUBSTR(HEX(nt_id), 1, 8),'-',SUBSTR(HEX(nt_id), 9, 4),'-',SUBSTR(HEX(nt_id), 13, 4),'-',SUBSTR(HEX(nt_id), 17, 4),'-',SUBSTR(HEX(nt_id), 21))) AS nt_id \n,LOWER(CONCAT (SUBSTR(HEX(nac_id), 1, 8),'-',SUBSTR(HEX(nac_id), 9, 4),'-',SUBSTR(HEX(nac_id), 13, 4),'-',SUBSTR(HEX(nac_id), 17, 4),'-',SUBSTR(HEX(nac_id), 21))) AS nac_id \n,nnac_created\n,nnac_modified\nFROM  organization.note_note_action_code\nWHERE nnac_modified >= STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowStart, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')\nAND nnac_modified < STR_TO_DATE('@{formatDateTime(pipeline().parameters.windowEnd, 'yyyy-MM-dd HH:mm' )}', '%Y-%m-%d %H:%i')",
+									"type": "Expression"
+								}
+							},
+							"sink": {
+								"type": "SqlDWSink",
+								"allowPolyBase": true,
+								"polyBaseSettings": {
+									"rejectValue": 0,
+									"rejectType": "value",
+									"useTypeDefault": false
+								}
+							},
+							"enableStaging": true,
+							"stagingSettings": {
+								"linkedServiceName": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"path": "vifiles"
+							},
+							"parallelCopies": 32,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "nt_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nt_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nac_id",
+											"type": "String"
+										},
+										"sink": {
+											"name": "nac_id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "nnac_created",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "nnac_created",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"name": "nnac_modified",
+											"type": "DateTime"
+										},
+										"sink": {
+											"name": "nnac_modified",
+											"type": "DateTime"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "RCM_ORGANIZATION",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SNK_SYN_RCM_ORGANIZATION_NOTE_NOTE_ACTION_CODE_INCR",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"windowStart": {
+						"type": "string"
+					},
+					"windowEnd": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-08T11:25:30Z"
+			},
+			"dependsOn": []
+		}
+	]
+}

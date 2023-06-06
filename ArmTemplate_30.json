@@ -1,0 +1,2819 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "PlanetFitnessDF"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DT_STG_POSPAYMENTTYPES_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "M_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "M_CREATED_LOCAL",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "M_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "M_ACTIVE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_NAME_PREFIX",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_NAME_LAST",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_NAME_FIRST",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_NAME_MI",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_NAME_FIRST_LAST",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_NAME_LAST_FIRST",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_ADDRESS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_CITY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_ZIP",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_EMAIL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_PHONE_HOME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_PHONE_CELL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_PHONE_WORK",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_PHONE_WORK_EXT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_PHONE_FAX",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_BIRTHDATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "M_GENDER",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "M_OCCUPATION",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_EMPLOYER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_AVAILABILITY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_EMERGENCY_LAST_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_EMERGENCY_FIRST_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_EMERGENCY_MI",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_EMERGENCY_NAME_FIRST_LAST",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_EMERGENCY_NAME_LAST_FIRST",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_EMERGENCY_PHONE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_EMERGENCY_EXT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_EMERGENCY_AVAILABILITY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_BARCODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_STATUS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_ABC_STATUS_REASON",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_ABC_STATUS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_ABC_ORDINAL",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "M_SKIP_EMAIL_ALERT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_RELATION_TO_PRIMARY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_CARDS_REISSUED",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "M_LAST_CHECKIN_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "M_WEIGHT_START",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "M_WEIGHT_TARGET",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "M_FAF_CONVERTED",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "M_MISC_1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_MISC_2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_MISC_3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_PRE_PAY_AMOUNT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "M_CHARGES_ALLOWED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_CREDIT_LIMIT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "M_FINGERPRINT",
+						"type": "varbinary"
+					},
+					{
+						"name": "M_CLUB_ACCOUNT_BILL_VIA_ABC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ATL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CAPM_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "G_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TZL_ID_CREATED_LOCAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "STL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MP_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_CHECKIN_COUNT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "M_DELETED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "E_ID_DELETED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_RECEIVE_EMAIL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_CONFIRM_EMAIL",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "M_MEMBER_ACTIVITIES_COUNT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "M_CONFIRM_EMAIL_SENT",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "M_PHONE_HOME_TEXT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_PHONE_CELL_TEXT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_PHONE_WORK_TEXT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_CONFIRM_TEXT",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "M_CREATED_AS_PROSPECT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_EMAIL_HOLD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_SMS_HOLD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UDFTAB_ID",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "UDFV_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_ACCESS_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_ACCESS_CODE_FAILURES",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "M_CLUB_ACCOUNT_IN_USE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AI_ID_CLUB_ACCOUNT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AI_ID_CARD_ON_FILE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_MODIFIED_DW",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "M_ADDRESS_2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_REMOTE_CHECKIN_COUNT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "M_CONVERSION_AGREEMENT_NUMBER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_SILVER_SNEAKERS_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CTL_DEFAULT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_CLUB_CREDIT_LIMIT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "M_CLUB_CREDIT_LIMIT_OVERRIDE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_MODIFIED_API",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "SOURCE_SYSTEM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DW_CHANGE_DATE",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_POSPAYMENTTYPES_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DT_STG_POSSUSPENDEDTRANSACTION_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_POSSUSPENDEDTRANSACTION_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DT_STG_POSTEDAGREEMENTS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "A_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_ACTIVE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_DEAD_COLUMN_1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_DATE_JOINED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_DATE_SIGNED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_EFFECTIVITY_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_EXPIRE_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_DOWN_PAYMENT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "A_SALE_PRICE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "A_RENEWAL_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_RENEWAL_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_RENEWAL_TERM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_RENEWAL_NUM_PAYMENTS",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "A_RENEWAL_CASH_PRICE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "A_RENEWAL_COUPON_PRICE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "A_RENEWAL_EFT_PRICE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "A_PATRON_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_AS400_SYNCED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_LAST_SYNC_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_STATUS_EFFECTIVE_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_MISC_1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_MISC_2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_MISC_3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_OVERPAYMENT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "A_REMAINING_BALANCE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "A_FIRST_DUE_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_OLDEST_NEXT_DUE_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_OLDEST_NEXT_DUE_AMOUNT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "A_NEXT_DUE_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_NEXT_DUE_AMOUNT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "A_LAST_SCHEDULED_DUE_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_LAST_PAYMENT_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_LAST_PAYMENT_AMOUNT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "A_LAST_PAYMENT_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_LAST_PAYMENT_DESCRIPTION",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_LAST_REWRITE_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_LAST_RENEWAL_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_VISITS_ALLOWED",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "A_VISITS_USED",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "A_ISSUED_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_FIRST_VISIT_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_CONVERSION_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_TOUR_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_POSTED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "AB_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "APM_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "APP_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AT_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "E_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MC_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LPL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_ID_REFERRED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PSF_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_ID_MASTER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DOC_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_THIRTY_DAYS",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "A_SIXTY_DAYS",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "A_NINETY_DAYS",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "A_OVER_NINETY_DAYS",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "A_LATE_FEE_TOTAL",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "A_LATE_FEE_OLDEST_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_SERVICE_FEE_TOTAL",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "A_SERVICE_FEE_OLDEST_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_RENEWAL_MAX_PAYMENT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "PSF_ID_RENEWAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_AGREEMENT_NUMBER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_MISC_4",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UDFTAB_ID",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "UDFV_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AES_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AI_ID_CCI",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AI_ID_EFTI",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_FREE_MONTHS",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "SLOC_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ID_QUEUE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_DEAD_COLUMN_2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_MULTI_PAY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_MODIFIED_DW",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_HOLD_FREE_RECURRING",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_ACCOUNT_INFO_SYNC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_SWITCHED_BILLING_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_CANCEL_BY_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_INVOICE_TOTAL_CALC",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "A_INVOICE_MONTHLY_CALC",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "A_FEE_TOTAL_CALC",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "A_DOWN_PAYMENT_CALC",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "POSST_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AET_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_NON_MEMBER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_DOWN_PAYMENT_FIRST_DUE_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_DOWN_PAYMENT_NUM_OF_PAYMENTS",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					},
+					{
+						"name": "PFREQ_ID_DOWN_PAYMENT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_DOWN_PAYMENT_MAX_DAYS",
+						"type": "decimal",
+						"precision": 3,
+						"scale": 0
+					},
+					{
+						"name": "A_DOWN_PAYMENT_SCHEDULE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_SILVER_SNEAKER_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "APM_ID_LAST_BILLABLE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AI_ID_ALT_PAY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_ALT_PAY_OFFERED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_ALT_PAY_ACTIVE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_MODIFIED_API",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "A_OLD_PROSPECT_EXPIRE_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "AC_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AES_ID_ORIGINAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FIRC_ID",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_POSTEDAGREEMENTS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DT_STG_POSTRANSACTIONS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "POS_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POS_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "POS_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "POS_TRANSACTION_DATE_LOCAL",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "POS_RETURN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POS_VOID_DATE_LOCAL",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "POS_RECEIPT_NUMBER",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "POS_NOTE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POS_CLUB_ACCOUNT_BALANCE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "POS_PRE_PAY_BALANCE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "POS_PAYMENT_TYPES",
+						"type": "nvarchar"
+					},
+					{
+						"name": "E_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "E_ID_VOID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PD_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "RETR_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TZL_ID_TRANSACTION_DATE_LOCAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TZL_ID_VOID_DATE_LOCAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "VR_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POS_SALES_TAX_WAIVED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POS_RECEIPT_SEQUENCE",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "POS_ITEM_TOTAL",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "POS_PAYMENT_TOTAL",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "POS_QB_EXPORT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CP_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POS_COMM_PAYABLE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "POS_SIGNATURE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POS_SIGNATURE_COMPRESSED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "VS_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "U_ID_SKIP_VERIFY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POS_VERSION",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_POSTRANSACTIONS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DT_STG_PROFITCENTERGROUPS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "PCGR_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "PCGR_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "PCGR_ACTIVE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_ABC_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_MODIFIED_DW",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "PCGR_ADP_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_ADP_EARNINGS_3_CODE",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_PROFITCENTERGROUPS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DT_STG_PROFITCENTERS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "PC_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PC_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "PC_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "PC_ACTIVE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PC_REQUIRED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PC_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PC_DESCRIPTION",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PC_GL_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PC_ABC_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PC_MODIFIED_DW",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "PC_ADP_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PC_ADP_EARNINGS_3_CODE",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "stg_profitcenters_incr"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DT_STG_RECURRINGSERVICEPLANCLUBS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "PCGR_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "PCGR_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "PCGR_ACTIVE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_ABC_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_MODIFIED_DW",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "PCGR_ADP_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_ADP_EARNINGS_3_CODE",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_RECURRINGSERVICEPLANCLUBS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DT_STG_RECURRINGSERVICEPLANS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "PCGR_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "PCGR_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "PCGR_ACTIVE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_ABC_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_MODIFIED_DW",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "PCGR_ADP_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_ADP_EARNINGS_3_CODE",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_RECURRINGSERVICEPLANS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DT_STG_REMOTECHECKINLOGS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "PCGR_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "PCGR_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "PCGR_ACTIVE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_ABC_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_MODIFIED_DW",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "PCGR_ADP_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_ADP_EARNINGS_3_CODE",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_REMOTECHECKINLOGS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DT_STG_SALEITEMS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "PCGR_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "PCGR_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "PCGR_ACTIVE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_ABC_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_MODIFIED_DW",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "PCGR_ADP_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PCGR_ADP_EARNINGS_3_CODE",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_SALEITEMS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DT_STG_SALESDISCOUNTTYPES_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "INCSC_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "INCSC_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "INCSC_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "INCSC_SPLIT",
+						"type": "decimal",
+						"precision": 3,
+						"scale": 0
+					},
+					{
+						"name": "E_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "INCS_ID",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_SALESDISCOUNTTYPES_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DT_STG_SERVICEPROVIDERS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CN_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CN_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "CN_CREATED_LOCAL",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "CN_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "CN_ACTIVE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CN_NOTE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "E_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MCD_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TZL_ID_CREATED",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_SERVICEPROVIDERS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DT_STG_STATIONLOCATIONS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "INCSC_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "INCSC_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "INCSC_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "INCSC_SPLIT",
+						"type": "decimal",
+						"precision": 3,
+						"scale": 0
+					},
+					{
+						"name": "E_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "INCS_ID",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_STATIONLOCATIONS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DT_STG_STATIONSETTINGSGROUP_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "INCSC_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "INCSC_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "INCSC_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "INCSC_SPLIT",
+						"type": "decimal",
+						"precision": 3,
+						"scale": 0
+					},
+					{
+						"name": "E_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "INCS_ID",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_STATIONSETTINGSGROUP_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DT_STG_STATIONSETTINGS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SS_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "SS_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "SS_ACTIVE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_NUMBER",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "SS_POS_CODE_REQD",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_RCPT_NUMBER",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 0
+					},
+					{
+						"name": "SS_RCPT_AUTO_PRINT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_RCPT_NUM_LINEFEEDS",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SS_LAST_LOGIN",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "SS_HAS_RCPT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_FINGERPRINT_SCANNER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_CARD_READER_PORT",
+						"type": "decimal",
+						"precision": 3,
+						"scale": 0
+					},
+					{
+						"name": "SS_MANUAL_CARD_ENTRY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIC_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CRT_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TERM_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_ABC_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_DISPLAY_IN_LIST",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PDOG_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "C_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_CAL_VIEW",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPT_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_MUTE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_AUTO_CLOSE_POS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_DRIVERS_LIC_SCAN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_CLIPGEM_LEFT",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SS_CLIPGEM_BOTTOM",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SS_CLIPGEM_WIDTH_ADJ",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SS_CLIPGEM_HEIGHT_ADJ",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "SS_CLIPGEM_ROTATION",
+						"type": "decimal",
+						"precision": 7,
+						"scale": 4
+					},
+					{
+						"name": "PDOG_ID_INCREMENTAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_QUICK_ENROLL_RECEIPT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_PRINT_ENROLL_COUPONS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_MEMBER_FACING_HIDE_MENU",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_HARDWARE_SERVICE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_HARDWARE_VERSION",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_HARDWARE_PORT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "SS_BACKGROUND_CHECK_IN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_PICTURE_RETRIEVAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_PICTURE_SOFTWARE_PATH",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_PICTURE_SAVE_PATH",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_SCANNER_RETRIEVAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_SCANNER_SOFTWARE_PATH",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_SCANNER_SAVE_PATH",
+						"type": "nvarchar"
+					},
+					{
+						"name": "D_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_HIDE_MENU_ROLLOFF",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_RENDER_PDF_ON_SERVER",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_SIGPAD_SERVICE_ENABLED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "STYP_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SLOC_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SSG_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_EAE_FULL_VIEW",
+						"type": "nvarchar"
+					},
+					{
+						"name": "QET_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "GTERM_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_TANNING",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_ESIGNATURE_COLLECT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_ESIGNATURE_PRINT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CR_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_QUICK_CASH_RECEIPT_EMAIL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_QUICK_CASH_RECEIPT_PRINT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_TOTAL_RECEIPT_EMAIL_DEFAULT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_TOTAL_RECEIPT_PRINT_DEFAULT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FSCAN_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CHRT_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_CHECK_READER_PORT",
+						"type": "decimal",
+						"precision": 3,
+						"scale": 0
+					},
+					{
+						"name": "RPI_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LTERM_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_EMV",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_EMV_PORT",
+						"type": "decimal",
+						"precision": 5,
+						"scale": 0
+					},
+					{
+						"name": "SS_EMV_VERSION",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_AUTOLOGOUT",
+						"type": "decimal",
+						"precision": 2,
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_STATIONSETTINGS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DT_STG_TIMETRACKINGBREAKS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "TTB_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TT_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TTB_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "TTB_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "TTB_ACTIVE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TTB_CLOCK_IN",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "TTB_CLOCK_IN_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "TTB_CLOCK_OUT",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "TTB_CLOCK_OUT_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "TZL_ID_CLOCK_IN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TZL_ID_CLOCK_OUT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TZL_ID_CLOCK_IN_MODIFIED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TZL_ID_CLOCK_OUT_MODIFIED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TTB_CLOCK_IN_NOTE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TTB_CLOCK_OUT_NOTE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "VS_ID_CLOCK_IN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "VS_ID_CLOCK_OUT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "U_ID_CLOCK_IN_OVERRIDE_VERIFY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "U_ID_CLOCK_OUT_OVERRIDE_VERIFY",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_TIMETRACKINGBREAKS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DT_STG_TIMETRACKING_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "TT_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TT_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "TT_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "TT_ACTIVE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TT_CLOCK_IN",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "TT_CLOCK_IN_ALTERED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "TT_CLOCK_OUT",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "TT_CLOCK_OUT_ALTERED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "E_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SS_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TZL_ID_CLOCK_IN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TZL_ID_CLOCK_OUT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TZL_ID_CLOCK_IN_MODIFIED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TZL_ID_CLOCK_OUT_MODIFIED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TT_CLOCK_IN_NOTE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TT_CLOCK_OUT_NOTE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "VS_ID_CLOCK_IN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "VS_ID_CLOCK_OUT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "U_ID_CLOCK_IN_OVERRIDE_VERIFY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "U_ID_CLOCK_OUT_OVERRIDE_VERIFY",
+						"type": "nvarchar"
+					},
+					{
+						"name": "D_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TT_WAGE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_TIMETRACKING_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DT_STG_USERDEFINEDFIELDS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "UDFTAB_ID",
+						"type": "decimal",
+						"precision": 4,
+						"scale": 0
+					},
+					{
+						"name": "UDF_FIELD_INDEX",
+						"type": "decimal",
+						"precision": 3,
+						"scale": 0
+					},
+					{
+						"name": "UDF_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "UDF_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "UDF_ACTIVE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UDF_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UDF_ABC_CODE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UDF_DESCRIPTION",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UDF_EAE_COPIABLE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UDF_SORT_ORDER",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "UDFTYP_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UDF_VALUES",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UDF_ALERT_VALUES",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UDF_ALERT_MESSAGE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UDF_USE_MIN",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UDF_MIN",
+						"type": "decimal",
+						"precision": 23,
+						"scale": 2
+					},
+					{
+						"name": "UDF_USE_MAX",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UDF_MAX",
+						"type": "decimal",
+						"precision": 23,
+						"scale": 2
+					},
+					{
+						"name": "UDF_SELECT_ONE",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_USERDEFINEDFIELDS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DT_STG_USERDEFINEDFIELDVALUES_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "UDFTAB_ID",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "UDFV_ID",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_CREATED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "UDFV_MODIFIED",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "UDFV_VALUE_000",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_001",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_002",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_003",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_004",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_005",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_006",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_007",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_008",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_009",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_010",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_011",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_012",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_013",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_014",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_015",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_016",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_017",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_018",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_019",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_020",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_021",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_022",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_023",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_024",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_025",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_026",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_027",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_028",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_029",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_030",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_031",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_032",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_033",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_034",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_035",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_036",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_037",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_038",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_039",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_040",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_041",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_042",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_043",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_044",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_045",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_046",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_047",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_048",
+						"type": "varchar"
+					},
+					{
+						"name": "UDFV_VALUE_049",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_USERDEFINEDFIELDVALUES_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_DW_EFT_RECONCILIATION_DIFF')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "ETL_DATE_KEY",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "CLUB_NUMBER_I",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "CLUB_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "PROFIT_CENTER",
+						"type": "varchar"
+					},
+					{
+						"name": "INVOICE_AMOUNT",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "AS_OF",
+						"type": "date"
+					}
+				],
+				"typeProperties": {
+					"schema": "DW",
+					"table": "DW_EFT_RECONCILIATION_DIFF"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

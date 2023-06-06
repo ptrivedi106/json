@@ -1,0 +1,896 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "PlanetFitnessDF"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSynapseAnalyticstest')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "org_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "loc_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "it_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "it_version",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "it_active",
+						"type": "bit"
+					},
+					{
+						"name": "it_created",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "it_modified",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "it_name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "it_type",
+						"type": "nvarchar"
+					},
+					{
+						"name": "it_quantity",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "it_unlimited",
+						"type": "bit"
+					},
+					{
+						"name": "it_expiration_start_type",
+						"type": "nvarchar"
+					},
+					{
+						"name": "it_expiration_time",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "it_expiration_unit_type",
+						"type": "nvarchar"
+					},
+					{
+						"name": "cur_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "itca_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "it_description",
+						"type": "nvarchar"
+					},
+					{
+						"name": "it_is_actual",
+						"type": "bit"
+					},
+					{
+						"name": "it_default_due_date",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "it_is_lock",
+						"type": "bit"
+					},
+					{
+						"name": "it_price",
+						"type": "decimal",
+						"precision": 22,
+						"scale": 4
+					},
+					{
+						"name": "is_tax_included",
+						"type": "bit"
+					},
+					{
+						"name": "it_frequency",
+						"type": "nvarchar"
+					},
+					{
+						"name": "it_image_path",
+						"type": "nvarchar"
+					},
+					{
+						"name": "it_barcode",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SOURCE_SYSTEM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DW_CHANGE_DATE",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "it_origin",
+						"type": "nvarchar"
+					},
+					{
+						"name": "it_sku",
+						"type": "nvarchar"
+					},
+					{
+						"name": "it_upc",
+						"type": "nvarchar"
+					},
+					{
+						"name": "IS_UPDATE",
+						"type": "bit"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "CATALOG_ITEM"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/BrickBodiesRev')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Oracle2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "OracleTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "BETADATA",
+					"table": "MEMBERUDFVIEW"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Collection_By_Age')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Collection_By_Age"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Sftp1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "SftpLocation",
+						"fileName": "Financial_Detail_NssByTxnByActivityDate0ConveyedNegativeRefund_99000_20220909.CSV"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Reporting Group",
+						"type": "String"
+					},
+					{
+						"name": "Merchant",
+						"type": "String"
+					},
+					{
+						"name": "Activity Date",
+						"type": "String"
+					},
+					{
+						"name": "Settlement Date",
+						"type": "String"
+					},
+					{
+						"name": "Vantiv Payment ID",
+						"type": "String"
+					},
+					{
+						"name": "Parent Vantiv Payment ID",
+						"type": "String"
+					},
+					{
+						"name": "Merchant Order Number",
+						"type": "String"
+					},
+					{
+						"name": "Txn Type",
+						"type": "String"
+					},
+					{
+						"name": "Purchase Currency",
+						"type": "String"
+					},
+					{
+						"name": "Purchase Amt",
+						"type": "String"
+					},
+					{
+						"name": "Settlement Currency",
+						"type": "String"
+					},
+					{
+						"name": "Settlement Amt",
+						"type": "String"
+					},
+					{
+						"name": "Payment Type",
+						"type": "String"
+					},
+					{
+						"name": "Account Suffix",
+						"type": "String"
+					},
+					{
+						"name": "Bin",
+						"type": "String"
+					},
+					{
+						"name": "Response Reason Message",
+						"type": "String"
+					},
+					{
+						"name": "Batch ID",
+						"type": "String"
+					},
+					{
+						"name": "Session ID",
+						"type": "String"
+					},
+					{
+						"name": "ARN",
+						"type": "String"
+					},
+					{
+						"name": "Interchange Rate",
+						"type": "String"
+					},
+					{
+						"name": "Customer ID",
+						"type": "String"
+					},
+					{
+						"name": "Merchant Transaction ID",
+						"type": "String"
+					},
+					{
+						"name": "Affiliate",
+						"type": "String"
+					},
+					{
+						"name": "Campaign",
+						"type": "String"
+					},
+					{
+						"name": "Merchant Grouping ID",
+						"type": "String"
+					},
+					{
+						"name": "Token Number",
+						"type": "String"
+					},
+					{
+						"name": "Transaction Processing Timestamp GMT",
+						"type": "String"
+					},
+					{
+						"name": "Approximate Interchange Fee Amount",
+						"type": "String"
+					},
+					{
+						"name": "Interchange Flat Rate",
+						"type": "String"
+					},
+					{
+						"name": "Interchange Percent Rate",
+						"type": "String"
+					},
+					{
+						"name": "Funding Method",
+						"type": "String"
+					},
+					{
+						"name": "Issuing Bank",
+						"type": "String"
+					},
+					{
+						"name": "Billing Descriptor",
+						"type": "String"
+					},
+					{
+						"name": "Merchant ID",
+						"type": "String"
+					},
+					{
+						"name": "Presenter",
+						"type": "String"
+					},
+					{
+						"name": "Vantiv cnpAPI Reporting Group",
+						"type": "String"
+					},
+					{
+						"name": "Customer Reference",
+						"type": "String"
+					},
+					{
+						"name": "Secondary Amt",
+						"type": "String"
+					},
+					{
+						"name": "Secondary Settlement Amt",
+						"type": "String"
+					},
+					{
+						"name": "Requested Auth Amount",
+						"type": "String"
+					},
+					{
+						"name": "Original Auth Code",
+						"type": "String"
+					},
+					{
+						"name": "Customer Name",
+						"type": "String"
+					},
+					{
+						"name": "Address Line 1",
+						"type": "String"
+					},
+					{
+						"name": "Address Line 2",
+						"type": "String"
+					},
+					{
+						"name": "City",
+						"type": "String"
+					},
+					{
+						"name": "State",
+						"type": "String"
+					},
+					{
+						"name": "Postal Code",
+						"type": "String"
+					},
+					{
+						"name": "Fraud Checksum Response Code",
+						"type": "String"
+					},
+					{
+						"name": "Fraud Checksum Response Message",
+						"type": "String"
+					},
+					{
+						"name": "AVS Response Code",
+						"type": "String"
+					},
+					{
+						"name": "AVS Response Message",
+						"type": "String"
+					},
+					{
+						"name": "Token Response Code",
+						"type": "String"
+					},
+					{
+						"name": "Token Response Message",
+						"type": "String"
+					},
+					{
+						"name": "PINless Debit Network",
+						"type": "String"
+					},
+					{
+						"name": "Merchant Category Code",
+						"type": "String"
+					},
+					{
+						"name": "Billing Profile Id",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "subscription.csv",
+						"container": "vifiles"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText3')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "usage.csv",
+						"container": "vifiles"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText4')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "members.csv",
+						"container": "vifiles"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText5')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "vifiles"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DestinationDataset_5sa')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_CLUBS"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DestinationDataset_j5r')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"cw_table": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": {
+						"value": "@dataset().cw_table",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DestinationDataset_k5a')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "Column1",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "abcpi",
+					"table": "BrianTest"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Events_to_bb')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FormaTestData')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Oracle1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "OracleTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Iseries_Prod')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Iseries_Prod",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Db2Table",
+				"schema": [],
+				"typeProperties": {
+					"schema": "",
+					"table": ""
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Iseries_Prod_cdfil')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Iseries_Prod",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Db2Table",
+				"schema": [],
+				"typeProperties": {
+					"schema": "ABC400FIL",
+					"table": "CDFIL"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/KMTEST')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlob_PFSNOWINT",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"folderPath": "DIMMEMBER",
+						"container": "snowuat"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "'"
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Members_brick_Bodies')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Oracle2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "OracleTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "BETADATA",
+					"table": "MEMBERUDFVIEW"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/OracleTable1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Oracle1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "OracleTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "DW",
+					"table": "CLUB_VW"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/OracleTable2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Oracle2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "OracleTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "DW",
+					"table": "CLUB_VW"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/OracleTable3')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Oracle2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "OracleTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		}
+	]
+}

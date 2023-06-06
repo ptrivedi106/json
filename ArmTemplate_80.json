@@ -1,0 +1,1741 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "PlanetFitnessDF"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/Checkins_IsDeleted_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "CheckIns_IsDelete_SQLPOOL",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2022-06-04T14:00:00",
+						"timeZone": "Central Standard Time"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PFMemberAgreementUDF')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "PF_Agreement_UDF",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					},
+					{
+						"pipelineReference": {
+							"referenceName": "PF_Member_UDF",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Hour",
+						"interval": 12,
+						"startTime": "2021-11-19T20:06:00Z",
+						"timeZone": "UTC"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PF_Alternate_Billing')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "PF_Aternate_Billing",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2022-06-03T03:30:00",
+						"timeZone": "Pacific Standard Time"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger1')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "HostBoundTrans",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Hour",
+						"interval": 6,
+						"startTime": "2022-11-04T03:00:00Z",
+						"timeZone": "UTC"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger2')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "ServiceProviderLocations_SQLPOOL",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Hour",
+						"interval": 5,
+						"startTime": "2022-12-07T18:19:00Z",
+						"timeZone": "UTC"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Check_ABC400FIL_JOBSTATSF_Completion_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Load Table for FactCollection_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Until1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_Iseries_FactColl_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Set variable - Default",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "status_value",
+							"value": {
+								"value": "'0'",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Until1",
+						"type": "Until",
+						"dependsOn": [
+							{
+								"activity": "Set variable - Default",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@equals(variables('status_value'),'1')",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Lookup1",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "Db2Source",
+											"query": {
+												"value": "select '1' as value \nfrom ABC400FIL.JOBSTATSF \nWHERE JBJOBNME = 'CLBPFCTR'\nAND JBPROCNME = 'CLBPFCTR'\nAND JBACTION = 'END' \nAND JBSYSDATE = VARCHAR_FORMAT(CURRENT DATE, 'YYYYMMDD')",
+												"type": "Expression"
+											}
+										},
+										"dataset": {
+											"referenceName": "SRC_ABC400FIL",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									}
+								},
+								{
+									"name": "Set variable2",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Lookup1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "status_value",
+										"value": {
+											"value": "@coalesce(activity('Lookup1').output?.firstRow?.value,'0')",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "If Condition1",
+									"type": "IfCondition",
+									"dependsOn": [
+										{
+											"activity": "Set variable2",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@equals(variables('status_value'),'0')",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "Wait 30 secs",
+												"type": "Wait",
+												"dependsOn": [],
+												"userProperties": [],
+												"typeProperties": {
+													"waitTimeInSeconds": 30
+												}
+											}
+										]
+									}
+								}
+							],
+							"timeout": "0.12:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"variables": {
+					"status_value": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "Iseries_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-08T11:25:48Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Load_Source_Oracle_ALL_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Load_Source_Oracle_GroupNoDate",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ServiceProviderLocations",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_Oracle_GroupNoDate_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_Oracle_Group1_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ServiceProviderLocations",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_Oracle_Group1_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_Oracle_Group2_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ServiceProviderLocations",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_Oracle_Group2_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_Oracle_Group3_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ServiceProviderLocations",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_Oracle_Group3_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_Oracle_Group4_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ServiceProviderLocations",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_Oracle_Group4_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "ServiceProviderLocations",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ServiceProviderLocations_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Star_Sequence_1_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load_Source_Oracle_GroupNoDate",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Load_Source_Oracle_Group1_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Load_Source_Oracle_Group2_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Load_Source_Oracle_Group3_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Load_Source_Oracle_Group4_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Load_Source_Oracle_Group5_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Load_Source_Iseries_For_INZADBA",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Star_Sequence_1_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Star_Sequence_2_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load_Star_Sequence_1_SQLPOOL",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Star_Sequence_2_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Update_Statistics_Dimfact",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Load_Star_Sequence_5_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[DimFactPI].[Update_Statistics_Dimfact]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Load_Star_Sequence_4_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load_Star_Sequence_2_SQLPOOL",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Star_Sequence_4_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Star_Sequence_5_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load_Star_Sequence_4_SQLPOOL",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Star_Sequence_5_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_Oracle_Group5_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ServiceProviderLocations",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_Oracle_Group5_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_INZABA_Dimensions",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load_Star_Sequence_1_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_INZABA_Dimensions",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "LOAD_SNOWFLAKE_Group_1",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load_INZABA_Fact",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "LOAD_SNOWFLAKE_Group_1",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "LOAD_SNOWFLAKE_Group_2",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load_INZABA_Fact",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "LOAD_SNOWFLAKE_Group_2",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_EDW_VW_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load_Star_Sequence_1_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_EDW_VW_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_INZABA_Fact",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load_INZABA_Dimensions",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_INZABA_Fact",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Royalties_Group_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load_Star_Sequence_1_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Royalties_Group_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_Iseries_For_INZADBA",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ServiceProviderLocations",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_Iseries_For_INZADBA",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "PF_MSS_DD_SMRY_UPDATE",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Load_INZABA_Fact",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[DW].[PF_MSS_DD_SMRY_UPDATE]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Load_EDW_ALLOC_PF_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load_Star_Sequence_1_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_EDW_ALLOC_PF_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "Oracle_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-08T11:25:49Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Load_Source_RCM_All_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Load_Source_RCM_Organization_Group1_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Club RCM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_RCM_Organization_Group1_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_RCM_Taxation_SQL_POOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Club RCM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_RCM_Taxation_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_RCM_Catalog_SQL_POOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Club RCM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_RCM_Catalog_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load Stage Club RCM",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[DW].[Stage_Club_RCM_Load]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Load_Source_RCM_ABCbilling_Group_2_SQL_POOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Club RCM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_RCM_ABCbilling_Group_2_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_RCM_Hard_Collection_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Club RCM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_RCM_Hard_Collection_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_RCM_ABCbilling_Group_5_SQL_POOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Club RCM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_RCM_ABCbilling_Group_5_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_RCM_ABCbilling_Group_3_SQL_POOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Club RCM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_RCM_ABCbilling_Group_3_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_RCM_ABCbilling_Group_4_SQL_POOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Club RCM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_RCM_ABCbilling_Group_4_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Accounting_Group_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load_Source_RCM_Organization_Group1_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Load_Source_RCM_Taxation_SQL_POOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Load_Source_RCM_Catalog_SQL_POOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Load_Source_RCM_ABCbilling_Group_2_SQL_POOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Load_Source_RCM_Hard_Collection_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Load_Source_RCM_ABCbilling_Group_5_SQL_POOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Load_Source_RCM_ABCbilling_Group_3_SQL_POOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Load_Source_RCM_ABCbilling_Group_4_SQL_POOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Load_Source_RCM_Member_Transfer_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Load_Source_RCM_ABCbilling_POS_Group_2_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Load_Source_RCM_ABCbilling_Pos_Group_1_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Load_Source_RCM_ABCbilling_GroupNoDate_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Load_Source_RCM_ABCbilling_Group_1_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Load_Source_RCM_Organization_Group2_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Accounting_Group_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_RCM_Member_Transfer_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Club RCM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_RCM_Member_Transfer_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_RCM_ABCbilling_POS_Group_2_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Club RCM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_RCM_ABCbilling_POS_Group_2_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_RCM_ABCbilling_Pos_Group_1_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Club RCM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_RCM_ABCbilling_POS_Group_1_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_RCM_ABCbilling_GroupNoDate_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Club RCM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_RCM_ABCbilling_GroupNoDate_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_RCM_ABCbilling_Group_1_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Club RCM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_RCM_ABCbilling_Group_1_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "LOAD_RCM_PF",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load_Accounting_Group_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "LOAD_RCM_PF",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "LOAD_RCM_ALLOC_PF",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load_Accounting_Group_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "LOAD_RCM_ALLOC_PF",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_DW_Facts_RCM",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load_Accounting_Group_SQLPOOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_DW_Facts_RCM",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_RCM_Organization_Group2_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Club RCM",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_RCM_Organization_Group2_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "RCM_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-22T14:15:10Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/EDW_DW_VW')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Load_EDW_VW_SQLPOOL",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Hour",
+						"interval": 24,
+						"startTime": "2023-03-20T09:00:00",
+						"timeZone": "Central Standard Time"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Load_source_Iseries_CIFIL_CWFIL_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Load_Source_Iseries_CIFIL_CWFIL_SQLPOOL",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2023-01-04T06:00:00",
+						"timeZone": "Central Standard Time"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PF_PROJECTION')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "PF_PROJECTION",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Hour",
+						"interval": 24,
+						"startTime": "2023-03-15T01:30:00",
+						"timeZone": "Central Standard Time"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SQL_POOL_LOAD_ORACLE_1')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Load_Source_Oracle_Group1_SQLPOOL",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Hour",
+						"interval": 6,
+						"startTime": "2022-12-08T17:14:00Z",
+						"timeZone": "UTC"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Load_Snowflake_Daily_count')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Load_Source_SNOWFLAKE_DAILY_COUNTS_LOAD",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2023-06-05T18:00:00",
+						"timeZone": "Central Standard Time",
+						"schedule": {}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Load_Source_Iseries_All_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Load Stage Iseries Club",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ABC400FIL_CBFIL_SQL_POOL",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[DW].[Stage_Club_Iseries_Load]"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureSynapseAnalytics1",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Load_Source_Iseries_GroupNoDate_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Iseries Club",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_Iseries_GroupNoDate_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_Iseries_Group1_SQLPOOL1",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Iseries Club",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_Iseries_Group1_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "ABC400FIL_CBFIL_SQL_POOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ABC400FIL_CBFIL_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load Table for FactCollection_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Iseries Club",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Check_ABC400FIL_JOBSTATSF_Completion_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_Iseries_Group2_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Iseries Club",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_Iseries_Group2_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_Iseries_Group3_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Iseries Club",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_Iseries_Group3_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Load_Source_Iseries_Group4_SQLPOOL",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Load Stage Iseries Club",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Load_Source_Iseries_Group4_SQLPOOL",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"variables": {
+					"test": {
+						"type": "String",
+						"defaultValue": "0"
+					}
+				},
+				"folder": {
+					"name": "Iseries_SQLPOOL"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-24T15:45:52Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Check_ABC400FIL_JOBSTATSF_Completion_SQLPOOL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Load RCM Source All_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Load_Source_RCM_All_SQLPOOL",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Hour",
+						"interval": 8,
+						"startTime": "2021-11-12T05:00:00",
+						"timeZone": "Central Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Load_Source_RCM_All_SQLPOOL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Load Source Oracle All- SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Load_Source_Oracle_ALL_SQLPOOL",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Hour",
+						"interval": 4,
+						"startTime": "2022-12-08T07:00:00",
+						"timeZone": "Central Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Load_Source_Oracle_ALL_SQLPOOL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Load_Source_ISeries_All_SQLPOOL')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Load_Source_Iseries_All_SQLPOOL",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2021-10-26T03:00:00",
+						"timeZone": "Central Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Load_Source_Iseries_All_SQLPOOL')]"
+			]
+		}
+	]
+}

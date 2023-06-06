@@ -1,0 +1,155 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "PlanetFitnessDF"
+		},
+		"AZURE_BLOB_STORAGE_SNOWDEV_connectionString": {
+			"value": ""
+		},
+		"AzureBlob_connectionString": {
+			"value": ""
+		},
+		"AzureBlobStorage1_connectionString": {
+			"value": ""
+		},
+		"AzureDataLakeStorage1_accountKey": {
+			"value": ""
+		},
+		"AzureSqlDatabase1_connectionString": {
+			"value": ""
+		},
+		"AzureSqlDatabase2_connectionString": {
+			"value": ""
+		},
+		"AzureSqlDatabase3_connectionString": {
+			"value": ""
+		},
+		"AzureSqlDatabase3PFcopy_connectionString": {
+			"value": ""
+		},
+		"AzureSqlDatabase4_connectionString": {
+			"value": ""
+		},
+		"AzureSqlDatabaseHyper_connectionString": {
+			"value": ""
+		},
+		"AzureSqlDatabasePFBC_connectionString": {
+			"value": ""
+		},
+		"AzureSynapseAnalytics1_connectionString": {
+			"value": ""
+		},
+		"AzureSynapsePool_connectionString": {
+			"value": ""
+		},
+		"AzureTableStorage1_connectionString": {
+			"value": ""
+		},
+		"Fitness_BI_Replica_connectionString": {
+			"value": ""
+		},
+		"Iseries_Prod_connectionString": {
+			"value": ""
+		},
+		"Oracle1_connectionString": {
+			"value": ""
+		},
+		"Oracle2_connectionString": {
+			"value": ""
+		},
+		"Oracle3_connectionString": {
+			"value": ""
+		},
+		"OraclePFView_connectionString": {
+			"value": ""
+		},
+		"PlanetFitnessProd_connectionString": {
+			"value": ""
+		},
+		"RCMProd_ABCBilling_POS_connectionString": {
+			"value": ""
+		},
+		"RCMProd_ABCbilling_connectionString": {
+			"value": ""
+		},
+		"RCMProd_Catalog_connectionString": {
+			"value": ""
+		},
+		"RCMProd_HardCollection_connectionString": {
+			"value": ""
+		},
+		"RCMProd_Organization_connectionString": {
+			"value": ""
+		},
+		"RCMProd_Taxation_connectionString": {
+			"value": ""
+		},
+		"RCMProd_member_transfer_connectionString": {
+			"value": ""
+		},
+		"SQLPoolAS_connectionString": {
+			"value": ""
+		},
+		"Sftp1_password": {
+			"value": ""
+		},
+		"Snowflake1_connectionString": {
+			"value": ""
+		},
+		"fitness bi_connectionString": {
+			"value": ""
+		},
+		"gymsales_connectionString": {
+			"value": ""
+		},
+		"stage_link_blob_connectionString": {
+			"value": ""
+		},
+		"AZURE_BLOB_STORAGE_sasUri": {
+			"value": ""
+		},
+		"AzureBlob_PFSNOWINT_sasUri": {
+			"value": ""
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"value": "https://pfunited.dfs.core.windows.net/"
+		},
+		"RestService1_properties_typeProperties_url": {
+			"value": "https://abc.vi-partners-test.xyz"
+		},
+		"Sftp1_properties_typeProperties_host": {
+			"value": "secureftp.abcfinancial.com"
+		},
+		"Sftp1_properties_typeProperties_userName": {
+			"value": "litlereportpull"
+		},
+		"linkedService1_sasUri": {
+			"value": ""
+		},
+		"integrationRuntimeSSISPF_properties_typeProperties_ssisProperties_catalogInfo_catalogServerEndpoint": {
+			"value": "fitnessbidb1.database.windows.net"
+		},
+		"integrationRuntimeSSISPF_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminUserName": {
+			"value": "FBIADMIN"
+		},
+		"integrationRuntimeSSISPF_properties_typeProperties_ssisProperties_catalogInfo_catalogAdminPassword": {
+			"value": ""
+		},
+		"integrationRuntimepf_properties_typeProperties_linkedInfo_resourceId": {
+			"value": "/subscriptions/11423360-c96a-4d92-8e58-806b30cd5e72/resourcegroups/ABC_TEST/providers/Microsoft.DataFactory/factories/DatafactoryABCtesting/integrationruntimes/integrationRuntime1"
+		},
+		"AzureSqlDatabase1_properties_privateLinkResourceId": {
+			"value": "/subscriptions/11423360-c96a-4d92-8e58-806b30cd5e72/resourceGroups/SQL_DB/providers/Microsoft.Sql/servers/fitnessbidb1"
+		},
+		"AzureSqlDatabase1_properties_groupId": {
+			"value": "sqlServer"
+		},
+		"AzureSqlDatabase1_properties_fqdns": {
+			"value": [
+				"fitnessbidb1.database.windows.net"
+			]
+		}
+	}
+}

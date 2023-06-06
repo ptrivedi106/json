@@ -1,0 +1,956 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "PlanetFitnessDF"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_AGREEMENTTYPESERVICEITEMREF_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_AGREEMENTTYPESERVICEITEMREF_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_ALERTATTRIBUTES_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_ALERTATTRIBUTES_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_ALERTHISTORY_FINAL_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Dest for missing AlertHistory missing INCR rows",
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "AH_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "AH_LEVEL",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "AH_MESSAGE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_COLOR_HEX",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_NOTE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_DISPLAY_ORDER",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "AA_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MAL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_RECORD_ALERT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_ID",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_ALERTHISTORY_INCR_FINAL"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_ALERTHISTORY_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_ALERTHISTORY_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_ALERTHISTORY_MISSING_01_2_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Dest for missing AlertHistory missing INCR rows",
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "AH_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "AH_LEVEL",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "AH_MESSAGE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_COLOR_HEX",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_NOTE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_DISPLAY_ORDER",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "AA_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MAL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_RECORD_ALERT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_ID",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_ALERTHISTORY_MISSING_01_2_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_ALERTHISTORY_MISSING_02_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Dest for missing AlertHistory missing INCR rows",
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "AH_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "AH_LEVEL",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "AH_MESSAGE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_COLOR_HEX",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_NOTE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_DISPLAY_ORDER",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "AA_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MAL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_RECORD_ALERT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_ID",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_ALERTHISTORY_MISSING_02_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_ALERTHISTORY_MISSING_03_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Dest for missing AlertHistory missing INCR rows",
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "AH_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "AH_LEVEL",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "AH_MESSAGE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_COLOR_HEX",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_NOTE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_DISPLAY_ORDER",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "AA_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MAL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_RECORD_ALERT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "A_ID",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_ALERTHISTORY_MISSING_03_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_ALERTHISTORY_MISSING_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Dest for missing AlertHistory missing INCR rows",
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_ALERTHISTORY_MISSING_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_ALERTHISTORY_MISSING_UNIONTST_03_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "COL1",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "COL2",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "DMS_UNION_TEST_03"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_ALERTHISTORY_Oracle_UniqueIDs_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "AH_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AH_CREATED",
+						"type": "datetime2",
+						"scale": 7
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_ALERTHISTORY_Oracle_Unique_VPD_IDs"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_CAMPAIGNSOURCEREF_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_CAMPAIGNSOURCEREF_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_CANCELREASONCODES_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_CANCELREASONCODES_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_CATALOGITEMCATEGORIES_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "ABCPI_STG_CATALOGITEMCATEGORIES staging table load",
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_CATALOGITEMCATEGORIES_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_CATALOGITEMS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_CATALOGITEMS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_CATALOGITEMTAXREF_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_CATALOGITEMTAXREF_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_CATALOGS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_CATALOGS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_CHECKINLOGS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "SNK_ABCPI_STG_CHECKINLOGS: staging table",
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_CHECKINLOGS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_CHECKINLOGS_INCR_02')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CIL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_CHECKIN_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "CIL_CHECKIN_DATE_LOCAL",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "CIL_CHECKIN_DATE_ONLY",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 0
+					},
+					{
+						"name": "CIL_AGREEMENT_NUM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_AGREEMENT_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_RENEWAL_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_HAS_ALERTS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_HAS_NOTES",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_OVERRIDE_STATE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_ACKNOWLEDGED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_STATION_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TZL_ID_CHECKIN_DATE_LOCAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_LAST_CHECKIN_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "AH_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "BES_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SOURCE_SYSTEM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DW_CHANGE_DATE",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_CHECKINLOGS_INCR_02"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_CHECKINLOGS_INCR_03')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CIL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_CHECKIN_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "CIL_CHECKIN_DATE_LOCAL",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "CIL_CHECKIN_DATE_ONLY",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 0
+					},
+					{
+						"name": "CIL_AGREEMENT_NUM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_AGREEMENT_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_RENEWAL_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_HAS_ALERTS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_HAS_NOTES",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_OVERRIDE_STATE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_ACKNOWLEDGED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_STATION_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TZL_ID_CHECKIN_DATE_LOCAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_LAST_CHECKIN_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "AH_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "BES_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SOURCE_SYSTEM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DW_CHANGE_DATE",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_CHECKINLOGS_INCR_03"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_STGDATATRAK_STG_CHECKINLOGS_INCR_04')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "CIL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_CHECKIN_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "CIL_CHECKIN_DATE_LOCAL",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "CIL_CHECKIN_DATE_ONLY",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 0
+					},
+					{
+						"name": "CIL_AGREEMENT_NUM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_AGREEMENT_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_RENEWAL_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_HAS_ALERTS",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_HAS_NOTES",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_OVERRIDE_STATE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_ACKNOWLEDGED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_STATION_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SPL_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TZL_ID_CHECKIN_DATE_LOCAL",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CIL_LAST_CHECKIN_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "AH_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "BES_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SOURCE_SYSTEM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DW_CHANGE_DATE",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "StgDatatrak",
+					"table": "STG_CHECKINLOGS_INCR_04"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

@@ -1,0 +1,1423 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "PlanetFitnessDF"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_ABCBILLING_SCHEDULED_FEE_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ABCBILLING_SCHEDULED_FEE_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_ABCBILLING_SETTLEMENT_EVALUATION_SCHEDULE_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "ctl_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ctl_created",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "ctl_modified",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "ctl_abbreviation",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ctl_code",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ABCBILLING_SETTLEMENT_EVALUATION_SCHEDULE_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_ABCBILLING_SETTLEMENT_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ABCBILLING_SETTLEMENT_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_ABCBILLING_STATEMENT_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "mtf_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "mtfc_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "client_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "mtf_transaction_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "mtf_type",
+						"type": "nvarchar"
+					},
+					{
+						"name": "mtf_amount",
+						"type": "decimal",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "org_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "mtf_created",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "mtf_modified",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "mtf_status",
+						"type": "nvarchar"
+					},
+					{
+						"name": "mtf_number",
+						"type": "nvarchar"
+					},
+					{
+						"name": "mtf_config_type",
+						"type": "nvarchar"
+					},
+					{
+						"name": "mtf_due_date",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "mtf_posting_date",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "agrm_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "led_type",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ABCBILLING_STATEMENT_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_ABCBILLING_SUBSCRIPTION_FREEZE_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ABCBILLING_SUBSCRIPTION_FREEZE_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_ABCBILLING_SUBSCRIPTION_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "pay_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "loc_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "st_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_posting_date",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "pay_amount",
+						"type": "decimal",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "pame_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_status",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_payment_gateway_transaction_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "org_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_created",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "pay_modified",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "reattempted_pay_id",
+						"type": "varbinary"
+					},
+					{
+						"name": "pay_type",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_due_date",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "agrm_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "tok_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_number",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_retry_count",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "tran_unique_transaction_number",
+						"type": "nvarchar"
+					},
+					{
+						"name": "payor_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_effective_date",
+						"type": "date"
+					},
+					{
+						"name": "pay_Scheduled_date",
+						"type": "date"
+					},
+					{
+						"name": "bpay_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_comment",
+						"type": "nvarchar"
+					},
+					{
+						"name": "source_loc_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "slb_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "led_type",
+						"type": "varchar"
+					},
+					{
+						"name": "pay_response_codes",
+						"type": "varchar"
+					},
+					{
+						"name": "ppt_id",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ABCBILLING_SUBSCRIPTION_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_ABCBILLING_SUBSCRIPTION_ITEM_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ABCBILLING_SUBSCRIPTION_ITEM_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_ABCBILLING_SUBSCRIPTION_ITEM_PRICE_ADJUSTMENT_CONFIG_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "ctl_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ctl_created",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "ctl_modified",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "ctl_abbreviation",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ctl_code",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ABCBILLING_SUBSCRIPTION_ITEM_PRICE_ADJUSTMENT_CONFIG_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_ABCBILLING_SUBSCRIPTION_ITEM_PRICE_ADJUSTMENT_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "sipa_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "sipa_start_date",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "sipa_invoice_count",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "sipa_generated_count",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "sipa_status",
+						"type": "nvarchar"
+					},
+					{
+						"name": "loc_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "org_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "sipac_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "suit_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "sipa_created",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "sipa_modified",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "sipa_type",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ABCBILLING_SUBSCRIPTION_ITEM_PRICE_ADJUSTMENT_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_ABCBILLING_SUBSCRIPTION_MEMBER_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "sub_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "m_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "sume_created",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "org_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "HASHKEY",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ABCBILLING_SUBSCRIPTION_MEMBER_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_ABCBILLING_UNMANAGED_ACH_RETURN_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "pay_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "loc_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "st_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_posting_date",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "pay_amount",
+						"type": "decimal",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "pame_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_status",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_payment_gateway_transaction_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "org_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_created",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "pay_modified",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "reattempted_pay_id",
+						"type": "varbinary"
+					},
+					{
+						"name": "pay_type",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_due_date",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "agrm_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "tok_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_number",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_retry_count",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "tran_unique_transaction_number",
+						"type": "nvarchar"
+					},
+					{
+						"name": "payor_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_effective_date",
+						"type": "date"
+					},
+					{
+						"name": "pay_Scheduled_date",
+						"type": "date"
+					},
+					{
+						"name": "bpay_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_comment",
+						"type": "nvarchar"
+					},
+					{
+						"name": "source_loc_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "slb_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "led_type",
+						"type": "varchar"
+					},
+					{
+						"name": "pay_response_codes",
+						"type": "varchar"
+					},
+					{
+						"name": "ppt_id",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ABCBILLING_UNMANAGED_ACH_RETURN_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_ABCBILLING_UNMANAGED_CHARGEBACK_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "pay_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "loc_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "st_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_posting_date",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "pay_amount",
+						"type": "decimal",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "pame_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_status",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_payment_gateway_transaction_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "org_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_created",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "pay_modified",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "reattempted_pay_id",
+						"type": "varbinary"
+					},
+					{
+						"name": "pay_type",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_due_date",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "agrm_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "tok_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_number",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_retry_count",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "tran_unique_transaction_number",
+						"type": "nvarchar"
+					},
+					{
+						"name": "payor_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_effective_date",
+						"type": "date"
+					},
+					{
+						"name": "pay_Scheduled_date",
+						"type": "date"
+					},
+					{
+						"name": "bpay_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_comment",
+						"type": "nvarchar"
+					},
+					{
+						"name": "source_loc_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "slb_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "led_type",
+						"type": "varchar"
+					},
+					{
+						"name": "pay_response_codes",
+						"type": "varchar"
+					},
+					{
+						"name": "ppt_id",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ABCBILLING_UNMANAGED_CHARGEBACK_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_ABCBILLING_UNMANAGED_PAYMENT_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "pay_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "loc_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "st_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_posting_date",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "pay_amount",
+						"type": "decimal",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "pame_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_status",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_payment_gateway_transaction_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "org_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_created",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "pay_modified",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "reattempted_pay_id",
+						"type": "varbinary"
+					},
+					{
+						"name": "pay_type",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_due_date",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "agrm_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "tok_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_number",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_retry_count",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "tran_unique_transaction_number",
+						"type": "nvarchar"
+					},
+					{
+						"name": "payor_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_effective_date",
+						"type": "date"
+					},
+					{
+						"name": "pay_Scheduled_date",
+						"type": "date"
+					},
+					{
+						"name": "bpay_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_comment",
+						"type": "nvarchar"
+					},
+					{
+						"name": "source_loc_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "slb_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "led_type",
+						"type": "varchar"
+					},
+					{
+						"name": "pay_response_codes",
+						"type": "varchar"
+					},
+					{
+						"name": "ppt_id",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ABCBILLING_UNMANAGED_PAYMENT_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_ABCBILLING_UNMANAGED_REFUND_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ABCBILLING_UNMANAGED_REFUND_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_ABCBILLING_Unmanaged_Ach_Return_Event_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "ctl_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ctl_created",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "ctl_modified",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "ctl_abbreviation",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ctl_code",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ABCBILLING_UNMANAGED_ACH_RETURN_EVENT_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_ABCBILLING__POS_REASON_CODE_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "ABCBILLING_POS_REASON_CODE_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_AUTHORIZATION_COMPANY_ROLE_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "ctl_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ctl_created",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "ctl_modified",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "ctl_abbreviation",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ctl_code",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "AUTHORIZATION_COMPANY_ROLE_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_AUTHORIZATION_COMPANY_ROLE_PERMISSION_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "ctl_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ctl_created",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "ctl_modified",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "ctl_abbreviation",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ctl_code",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "AUTHORIZATION_COMPANY_ROLE_PERMISSION_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_AUTHORIZATION_PERMISSION_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "ctl_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ctl_created",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "ctl_modified",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "ctl_abbreviation",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ctl_code",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "AUTHORIZATION_PERMISSION_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_SYN_RCM_Catalog_Item_Category_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "VPD_ID",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "POSI_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POSI_CREATED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "POSI_MODIFIED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "POSI_SEQUENCE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "POSI_UNIT_PRICE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "POSI_ORIGINAL_UNIT_PRICE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "POSI_ITEM_DISCOUNT_CALC",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "POSI_ITEM_DISCOUNT_PERCENT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "POSI_ITEM_DISCOUNT_AMOUNT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "POSI_INVOICE_DISCOUNT_CALC",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "POSI_INVOICE_DISCOUNT_PERCENT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "POSI_INVOICE_DISCOUNT_AMOUNT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "POSI_PACKAGE_QUANTITY",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "POSI_ORIGINAL_QUANTITY",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "POSI_QUANTITY_CHANGED",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "POSI_QUANTITY",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "POSI_QUANTITY_RETURNED",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "POSI_USED",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "POSI_USES_REMAINING",
+						"type": "decimal",
+						"precision": 6,
+						"scale": 0
+					},
+					{
+						"name": "POSI_LAST_USED_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "POSI_UPC",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POSI_ITEM_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POSI_SALES_TAX_WAIVED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POSI_METERED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POSI_EXPIRATION_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "POSI_PRICE_CALC",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "POSI_TAX_AMOUNT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "CGI_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CPR_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POS_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POSI_ID_RETURNED",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SDT_ID_ITEM",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SDT_ID_INVOICE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "WSTRR_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SAI_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "M_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TZL_ID_LAST_USED_DATE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SHR_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "E_ID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POSI_ID_REPLACEMENT",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POSI_EFFECTIVE_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "POSI_UNFREEZE_EXPIRATION_DATE",
+						"type": "datetime2",
+						"scale": 6
+					},
+					{
+						"name": "POSI_SALE_TYPE",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POSI_PROFIT_CENTER_NAME",
+						"type": "nvarchar"
+					},
+					{
+						"name": "POSI_COMM_AMOUNT",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "POSI_EVENT_COMM_UNIT_PRICE",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "POSI_CROSS_CLUB_SERVICE",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "StgRCM",
+					"table": "CATALOG_ITEM_CATEGORY_INCR"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

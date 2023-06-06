@@ -1,0 +1,541 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "PlanetFitnessDF"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_ABCPI_STG_DWMEMBERDATAVPDVIEW_VW')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "ABCPI",
+					"table": "STG_DWMEMBERDATAVPDVIEW_VW_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_ABCPI_STG_DW_ABC400FIL_BCZFILL9_VW')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "ABCPI",
+					"table": "STG_DW_ABC400FIL_BCZFILL9_VW_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_ABCPI_STG_DW_ABC400FIL_BPDTAX_VW')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "ABCPI",
+					"table": "STG_DW_ABC400FIL_BPDTAX_VW"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_ABCPI_STG_DW_ABC400FIL_MPBFIL_VW')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "ABCPI",
+					"table": "STG_DW_ABC400FIL_MPBFIL_VW_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_ABCPI_STG_DW_ABC400FIL_MPPFIL_VW')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "ABCPI",
+					"table": "STG_DW_ABC400FIL_MPPFIL_VW_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_ABCPI_STG_DW_DAILY_RDR_VW')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "ABCPI",
+					"table": "STG_DAILY_DEDUCTION_REIMBRSMNT_VW_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_ABCPI_STG_EVENTCLUBOPTOUTREF_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "ABCPI",
+					"table": "STG_EVENTCLUBOPTOUTREF_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_ABCPI_STG_EVENTS_DELETED_CHECKS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "ABCPI",
+					"table": "stg_events_deleted_check_incr"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_ABCPI_STG_STFIL_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "SNK_ABCPI_STG_STFIL staging table load",
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "ABCPI",
+					"table": "STG_STFIL_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_ACCOUNTING_CHARGEBACK_TRANSACTION_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "ACCOUNTING",
+					"table": "CHARGEBACK_TRANSACTION_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_ACCOUNTING_CLIENT_SCHEDULED_FEE_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "Accounting",
+					"table": "CLIENT_SCHEDULED_FEE_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_ACCOUNTING_CLIENT_TRANSACTION_FEE_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "ACCOUNTING",
+					"table": "CLIENT_TRANSACTION_FEE_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_ACCOUNTING_MEMBER_TRANSACTION_FEE_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "pay_posting_date",
+						"type": "date"
+					},
+					{
+						"name": "mtf_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "cae_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "fee_created",
+						"type": "date"
+					},
+					{
+						"name": "client_settlement_date",
+						"type": "date"
+					},
+					{
+						"name": "org_number",
+						"type": "nvarchar"
+					},
+					{
+						"name": "org_name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "loc_number",
+						"type": "nvarchar"
+					},
+					{
+						"name": "loc_name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "member_number",
+						"type": "nvarchar"
+					},
+					{
+						"name": "payor_account_number",
+						"type": "nvarchar"
+					},
+					{
+						"name": "account_type",
+						"type": "nvarchar"
+					},
+					{
+						"name": "cae_transaction_type",
+						"type": "nvarchar"
+					},
+					{
+						"name": "bae_type",
+						"type": "nvarchar"
+					},
+					{
+						"name": "cae_type",
+						"type": "nvarchar"
+					},
+					{
+						"name": "cae_amount",
+						"type": "decimal",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "pame_method",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pame_brand",
+						"type": "nvarchar"
+					},
+					{
+						"name": "fee_type",
+						"type": "nvarchar"
+					},
+					{
+						"name": "fee_status",
+						"type": "nvarchar"
+					},
+					{
+						"name": "fee_amount",
+						"type": "decimal",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "fee_number",
+						"type": "nvarchar"
+					},
+					{
+						"name": "pay_status",
+						"type": "nvarchar"
+					},
+					{
+						"name": "transaction_number",
+						"type": "nvarchar"
+					},
+					{
+						"name": "tran_unique_transaction_number",
+						"type": "nvarchar"
+					},
+					{
+						"name": "transaction_key",
+						"type": "varchar"
+					},
+					{
+						"name": "transaction_modified_date",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "HASHKEY",
+						"type": "varbinary"
+					}
+				],
+				"typeProperties": {
+					"schema": "ACCOUNTING",
+					"table": "MEMBER_TRANSACTION_FEE_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_ACCOUNTING_PAYMENT_TRANSACTION_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "ACCOUNTING",
+					"table": "PAYMENT_TRANSACTION_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_ACCOUNTING_RETURN_TRANSACTION_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "Accounting",
+					"table": "RETURN_TRANSACTION_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_ACCOUNTING_UNMANAGED_ACH_RETURN_TRANSACTION_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "Accounting",
+					"table": "UNMANAGED_ACH_RETURN_TRANSACTION_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_ACCOUNTING_UNMANAGED_CHARGEBACKS_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "Accounting",
+					"table": "UNMANAGED_CHARGEBACKS_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_ACCOUNTING_UNMANAGED_PAYMENT_REFUND_INCR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "Accounting",
+					"table": "UNMANAGED_PAYMENT_REFUND_INCR"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_DBO_PF_VIEWS_JOBS_CHECK')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "JOB_NAME",
+						"type": "varchar"
+					},
+					{
+						"name": "START_TIME",
+						"type": "varchar"
+					},
+					{
+						"name": "FINISH_TIME",
+						"type": "varchar"
+					},
+					{
+						"name": "STATUS",
+						"type": "varchar"
+					},
+					{
+						"name": "Job_Completed",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "FBI_JOB_NAME",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "PF_VIEWS_JOBS_CHECK"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SNK_DW3_DIMAGREEMENT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Oracle1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "OracleTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "DW3",
+					"table": "DIMAGREEMENT"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
